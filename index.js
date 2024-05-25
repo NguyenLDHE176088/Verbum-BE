@@ -1,16 +1,18 @@
+/* global process */
 import express from 'express';
-import { config } from 'dotenv';
+import 'dotenv/config';
+import authRouter from './route/auth-route.js';
 
-config();
 
 const app = express();
-const port = process.env.PORT || 8888;
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+app.use('/auth', authRouter);
+
+const port = process.env.PORT || 8888;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
 
 
