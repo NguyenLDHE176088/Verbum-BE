@@ -13,25 +13,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  USER
-  MANAGER
+model Role {
+  name        String @id
+  description String
+  crp         CRP[]
+  user        User[]
+}
+
+model Permission {
+  name        String @id
+  description String
+  crp         CRP[]
+}
+
+model CRP {
+  roleName       String
+  permissionName String
+  companyID      BigInt
+  role           Role       @relation(fields: [roleName], references: [name])
+  permission     Permission @relation(fields: [permissionName], references: [name])
+
+  @@id([roleName, permissionName])
 }
 
 model User {
-  id            String        @id @default(cuid())
-  name          String?
-  email         String        @unique
-  emailVerified DateTime?
-  image         String?
-  role          Role          @default(ADMIN)
-  accounts      Account[]
-  password      String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  UserProject   UserProject[]
-  UserJob       UserJob[]
+  id              String        @id @default(cuid())
+  name            String?
+  email           String        @unique
+  emailVerified   DateTime?
+  image           String?
+  roleName        String?
+  accounts        Account[]
+  password        String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  createdProjects Project[]     @relation("UserCreateProject")
+  onwerProjects   Project[]     @relation("UserOwnerProject")
+  UserCompany     UserCompany[]
+  Roc             Roc[]
+  role            Role?         @relation(fields: [roleName], references: [name])
 }
 
 model Account {
@@ -55,54 +75,137 @@ model Account {
   @@id([provider, providerAccountId])
 }
 
+model Company {
+  id             BigInt           @id @default(autoincrement())
+  name           String
+  description    String?
+  email          String           @unique
+  link           String?
+  status         String
+  language       String?
+  timeZone       String?
+  userCompany    UserCompany[]
+  companyProject CompanyProject[]
+}
+
+model UserCompany {
+  userId        String
+  companyId     BigInt
+  joinDate      DateTime
+  outDate       DateTime?
+  isHeadCompany Boolean
+  company       Company   @relation(fields: [companyId], references: [id])
+  user          User      @relation(fields: [userId], references: [id])
+
+  @@id([userId, companyId])
+}
+
+model CompanyProject {
+  companyId BigInt
+  projectId Int
+  Company   Company @relation(fields: [companyId], references: [id])
+  Project   Project @relation(fields: [projectId], references: [id])
+
+  @@id([companyId, projectId])
+}
+
 model Job {
   id          Int          @id @default(autoincrement())
   name        String
   description String
   status      String
+  dueDate     DateTime
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   ProjectJob  ProjectJob[]
-  UserJob     UserJob[]
+  Document    Document[]
 }
 
 model Project {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String
-  status      String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  ProjectJob  ProjectJob[]
-  UserProject UserProject[]
+  id             Int              @id @default(autoincrement())
+  name           String
+  createBy       String
+  description    String
+  status         String
+  onwer          String
+  sourceLanguage String
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  createUser     User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
+  onwerUser      User             @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
+  langeuage      Language         @relation(fields: [sourceLanguage], references: [code])
+  TargetLanguage TargetLanguage[]
+  ProjectJob     ProjectJob[]
+  CompanyProject CompanyProject[]
+  TermBase       TermBase[]
+  Reference      Reference[]
+}
+
+model TermBase {
+  id             Int           @id @default(autoincrement())
+  projectId      Int
+  term           String
+  sourceLanguage String
+  project        Project       @relation(fields: [projectId], references: [id])
+  ConceptBase    ConceptBase[]
+}
+
+model ConceptBase {
+  id                  Int      @id @default(autoincrement())
+  termBaseId          Int
+  concept             String
+  destinationLanguage String
+  termBase            TermBase @relation(fields: [termBaseId], references: [id])
+}
+
+model Reference {
+  id          BigInt  @id @default(autoincrement())
+  projectId   Int
+  name        String  @unique
+  description String?
+  data        Bytes
+  project     Project @relation(fields: [projectId], references: [id])
 }
 
 model ProjectJob {
   projectId Int
   jobId     Int
-  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  job       Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id])
+  job       Job     @relation(fields: [jobId], references: [id])
 
   @@id([projectId, jobId])
 }
 
-model UserProject {
-  userId    String
-  projectId Int
-  joinDate  DateTime
-  outDate   DateTime?
-  status    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-
-  @@id([userId, projectId])
+model Document {
+  id    BigInt @id @default(autoincrement())
+  jobId Int
+  data  Bytes
+  job   Job    @relation(fields: [jobId], references: [id])
+  Roc   Roc[]
 }
 
-model UserJob {
-  userId String
-  jobId  Int
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job    Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+model Roc {
+  id         Int      @id @default(autoincrement())
+  documentId BigInt
+  changeDate DateTime
+  data       Bytes
+  userId     String
+  document   Document @relation(fields: [documentId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
 
-  @@id([userId, jobId])
+model Language {
+  code           String           @id
+  name           String
+  TargetLanguage TargetLanguage[]
+  project        Project[]
+}
+
+model TargetLanguage {
+  languageCode String
+  projectId    Int
+  project      Project  @relation(fields: [projectId], references: [id])
+  language     Language @relation(fields: [languageCode], references: [code])
+
+  @@id([languageCode, projectId])
 }
