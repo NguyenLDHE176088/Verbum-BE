@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { createUser, findUserByEmail } from '../data/user.js';
-import { token } from '../token/token.js';
+import { generateToken,generateRefreshToken } from '../token/token.js';
 
 const authRouter = express.Router();
 
@@ -32,8 +32,10 @@ authRouter.route('/login').post(async (req, res) => {
     email: user.email,
     name: user.name
   };
-  const token = token(payload);
-
+  const token = generateToken(payload);
+  const refToken = generateRefreshToken(payload);
+  res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict' })
+  res.cookie('refToken', refToken, { httpOnly: true, secure: false, sameSite: 'strict' })
   return res.status(200).json({
     message: 'Login successful',
     token: token

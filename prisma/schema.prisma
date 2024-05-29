@@ -14,19 +14,19 @@ datasource db {
 }
 
 model Role {
-  name        String @id
+  name        String                  @id
   description String
-  crp         CRP[]
+  crp         CompanyRolePermission[]
   user        User[]
 }
 
 model Permission {
-  name        String @id
+  name        String                  @id
   description String
-  crp         CRP[]
+  crp         CompanyRolePermission[]
 }
 
-model CRP {
+model CompanyRolePermission {
   roleName       String
   permissionName String
   companyID      BigInt
@@ -37,21 +37,26 @@ model CRP {
 }
 
 model User {
-  id              String        @id @default(cuid())
+  id              String         @id @default(cuid())
   name            String?
-  email           String        @unique
+  email           String         @unique
   emailVerified   DateTime?
   image           String?
   roleName        String?
-  accounts        Account[]
   password        String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  createdProjects Project[]     @relation("UserCreateProject")
-  onwerProjects   Project[]     @relation("UserOwnerProject")
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  allowRejectJob  Boolean?
+  status          String?
+  role            Role?          @relation(fields: [roleName], references: [name])
+  accounts        Account[]
+  createdProjects Project[]      @relation("UserCreateProject")
+  onwerProjects   Project[]      @relation("UserOwnerProject")
   UserCompany     UserCompany[]
   Roc             Roc[]
-  role            Role?         @relation(fields: [roleName], references: [name])
+  UserJob         UserJob[]
+  LanguageUser    LanguageUser[]
+  UserProject     UserProject[]
 }
 
 model Account {
@@ -110,35 +115,88 @@ model CompanyProject {
 }
 
 model Job {
-  id          Int          @id @default(autoincrement())
-  name        String
-  description String
-  status      String
-  dueDate     DateTime
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  ProjectJob  ProjectJob[]
-  Document    Document[]
+  id            Int          @id @default(autoincrement())
+  name          String
+  description   String?
+  status        String
+  dueDate       DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  fileExtention String
+  ProjectJob    ProjectJob[]
+  Document      Document[]
+  UserJob       UserJob[]
+}
+
+model UserJob {
+  userId String
+  jobId  Int
+  user   User   @relation(fields: [userId], references: [id])
+  job    Job    @relation(fields: [jobId], references: [id])
+
+  @@id([userId, jobId])
 }
 
 model Project {
-  id             Int              @id @default(autoincrement())
-  name           String
-  createBy       String
-  description    String
-  status         String
-  onwer          String
-  sourceLanguage String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  createUser     User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
-  onwerUser      User             @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
-  langeuage      Language         @relation(fields: [sourceLanguage], references: [code])
-  TargetLanguage TargetLanguage[]
-  ProjectJob     ProjectJob[]
-  CompanyProject CompanyProject[]
-  TermBase       TermBase[]
-  Reference      Reference[]
+  id                              Int              @id @default(autoincrement())
+  name                            String
+  createBy                        String
+  description                     String
+  status                          String
+  onwer                           String
+  sourceLanguage                  String
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+  createUser                      User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
+  onwerUser                       User             @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
+  langeuage                       Language         @relation(fields: [sourceLanguage], references: [code])
+  dueDate                         DateTime
+  clientName                      String
+  metadata                        String
+  markProjectAssigned             String
+  markProjectCompleted            String
+  markProjectCanceled             Boolean
+  emptyTargetQA                   Boolean
+  emptyTargetIgnore               Boolean
+  extraNumberInTargetQA           Boolean
+  extraNumberInTargetIgnore       Boolean
+  inconsistenInTargetQA           Boolean
+  inconsistenInTargetIgnore       Boolean
+  leadingAndTrailingSpaceQA       Boolean
+  leadingAndTrailingSpaceIgnore   Boolean
+  maxTargetLengthPercentage       Int?
+  maxTargetLengthPercentageQA     Boolean
+  maxTargetLengthPercentageIgnore Boolean
+  maxTargetLengthCharacter        Int?
+  maxTargetLengthCharacterQA      Boolean
+  maxTargetLengthCharacterIgnore  Boolean
+  missingNumberQA                 Boolean
+  missingNumberIgnore             Boolean
+  missingSpaceQA                  Boolean
+  missingSpaceIgnore              Boolean
+  repeatedWordQA                  Boolean
+  repeatedWordIgnore              Boolean
+  spellingQA                      Boolean
+  spellingIgnore                  Boolean
+  targetTextIdenticalQA           Boolean
+  targetTextIdenticalIgnore       Boolean
+  TargetLanguage                  TargetLanguage[]
+  ProjectJob                      ProjectJob[]
+  CompanyProject                  CompanyProject[]
+  TermBase                        TermBase[]
+  Reference                       Reference[]
+  UserProject                     UserProject[]
+}
+
+model UserProject {
+  userId    String
+  projectId Int
+  joinDate  DateTime
+  outDate   DateTime?
+  user      User      @relation(fields: [userId], references: [id])
+  project   Project   @relation(fields: [projectId], references: [id])
+
+  @@id([userId, projectId])
 }
 
 model TermBase {
@@ -199,6 +257,16 @@ model Language {
   name           String
   TargetLanguage TargetLanguage[]
   project        Project[]
+  LanguageUser   LanguageUser[]
+}
+
+model LanguageUser {
+  languageCode String
+  userId       String
+  language     Language @relation(fields: [languageCode], references: [code])
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@id([languageCode, userId])
 }
 
 model TargetLanguage {
