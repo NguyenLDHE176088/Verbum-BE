@@ -16,37 +16,26 @@ datasource db {
 model Role {
   name        String                  @id
   description String
-  crp         CompanyRolePermission[]
   user        User[]
-}
-
-model Permission {
-  name        String                  @id
-  description String
-  crp         CompanyRolePermission[]
-}
-
-model CompanyRolePermission {
-  roleName       String
-  permissionName String
-  companyID      BigInt
-  role           Role       @relation(fields: [roleName], references: [name])
-  permission     Permission @relation(fields: [permissionName], references: [name])
-
-  @@id([roleName, permissionName])
 }
 
 model User {
   id              String         @id @default(cuid())
-  name            String?
+  firstName       String?
+  lastName        String?
   email           String         @unique
+  userName        String?        @unique
   emailVerified   DateTime?
   image           String?
   roleName        String?
   password        String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
-  allowRejectJob  Boolean?
+  allowRejectJob  Boolean?  @default(false)
+  allowManageJobs  Boolean? @default(false)
+  allowManageUsers  Boolean? @default(false)
+  allowManageTermBase Boolean? @default(false)
+  allowViewAllProject Boolean? @default(false)
   status          String?
   role            Role?          @relation(fields: [roleName], references: [name])
   accounts        Account[]
@@ -61,7 +50,7 @@ model User {
 
 model Account {
   userId            String
-  type              String
+  type              String?
   provider          String
   providerAccountId String
   refresh_token     String?
@@ -261,12 +250,13 @@ model Language {
 }
 
 model LanguageUser {
-  languageCode String
-  userId       String
+  languageCode String 
+  userId       String 
+  type         String 
   language     Language @relation(fields: [languageCode], references: [code])
   user         User     @relation(fields: [userId], references: [id])
 
-  @@id([languageCode, userId])
+  @@id([languageCode, userId, type])
 }
 
 model TargetLanguage {
