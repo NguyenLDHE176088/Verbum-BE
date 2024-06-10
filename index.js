@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import authRouter from './route/auth-route.js';
 import projectRouter from './route/projects.js';
+import languageRouter from './route/languages.js';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 
 app.use('/auth', authRouter);
 app.use('/projects', projectRouter);
+app.use('/languages', languageRouter);
 
 const port = process.env.PORT || 8888;
 app.listen(port, () => {
