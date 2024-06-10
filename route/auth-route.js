@@ -2,6 +2,8 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import db from '../data/user.js';
 import { generateToken,generateRefreshToken } from '../token/token.js';
+import { createUser, findUserByEmail } from '../data/user.js';
+import { generateToken, generateRefreshToken } from '../token/token.js';
 
 const authRouter = express.Router();
 
@@ -34,8 +36,8 @@ authRouter.route('/login').post(async (req, res) => {
   };
   const token = generateToken(payload);
   const refToken = generateRefreshToken(payload);
-  res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict' })
-  res.cookie('refToken', refToken, { httpOnly: true, secure: false, sameSite: 'strict' })
+  res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'strict' });
+  res.cookie('refToken', refToken, { httpOnly: true, secure: false, sameSite: 'strict' });
   return res.status(200).json({
     message: 'Login successful',
     token: token
