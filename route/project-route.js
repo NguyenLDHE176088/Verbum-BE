@@ -8,7 +8,7 @@ projectRouter.route('/').get(async (req, res) => {
   const projects = await db.project.findMany();
   res.status(200).json({
     status: 'success',
-    projects
+    data: projects
   });
 });
 
@@ -21,7 +21,7 @@ projectRouter.route('/:id').get(async (req, res) => {
   });
   res.status(200).json({
     id: id,
-    project
+    data: project
   });
 });
 
