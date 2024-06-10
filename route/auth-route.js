@@ -1,5 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
+import db from '../data/user.js';
+import { generateToken,generateRefreshToken } from '../token/token.js';
 import { createUser, findUserByEmail } from '../data/user.js';
 import { generateToken, generateRefreshToken } from '../token/token.js';
 
@@ -12,7 +14,7 @@ authRouter.route('/login').post(async (req, res) => {
       message: 'Email and password are required'
     });
   }
-  const user = await findUserByEmail(email);
+  const user = await db.findUserByEmail(email);
   if (!user) {
     return res.status(404).json({
       message: 'User not found'
@@ -50,7 +52,7 @@ authRouter.route('/register').post(async (req, res) => {
     });
   }
 
-  const exitingUser = await findUserByEmail(email);
+  const exitingUser = await db.findUserByEmail(email);
   if (exitingUser) {
     return res.status(400).json({
       message: 'Email already in use'
