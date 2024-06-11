@@ -4,10 +4,10 @@ import { createJob, getJobById, getAllJobs, updateJob, deleteJob } from '../data
 const router = express.Router();
 
 // Create Job
-router.post('/job', async (req, res) => {
-  const { name, description, status, dueDate, fileExtention } = req.body;
+router.post('/create', async (req, res) => {
+  const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId } = req.body;
   try {
-    const job = await createJob(name, description, status, dueDate, fileExtention);
+    const job = await createJob(name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId);
     res.status(201).json(job);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -15,7 +15,7 @@ router.post('/job', async (req, res) => {
 });
 
 // Get Job by ID
-router.get('/job/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const job = await getJobById(id);
@@ -36,11 +36,11 @@ router.get('/', async (req, res) => {
 });
 
 // Update Job
-router.put('/job/:id', async (req, res) => {
+router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, description, status, dueDate, fileExtention } = req.body;
+  const { dueDate, userIds } = req.body;
   try {
-    const job = await updateJob(id, name, description, status, dueDate, fileExtention);
+    const job = await updateJob(id, userIds, dueDate);
     res.status(200).json(job);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -48,7 +48,7 @@ router.put('/job/:id', async (req, res) => {
 });
 
 // Delete Job
-router.delete('/job/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     await deleteJob(id);
