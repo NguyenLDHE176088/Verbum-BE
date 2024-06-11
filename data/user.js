@@ -3,7 +3,7 @@ import db from '../prisma/prisma-instance.js';
 const createUser = async (payload) => {
   try {
     const result = await db.user.create({
-      data: payload
+      data: payload,
     });
     return result;
   } catch (error) {
@@ -15,28 +15,47 @@ const findUserByEmail = async (email) => {
   try {
     return await db.user.findUnique({
       where: {
-        email
-      }
+        email,
+      },
     });
   } catch (error) {
     throw new Error(error);
   }
-}
+};
 
 const findUserByUserName = async (userName) => {
   try {
     return await db.user.findUnique({
       where: {
-        userName
-      }
+        userName,
+      },
     });
   } catch (error) {
     throw new Error(error);
   }
-}
-
+};
+const deleteUser = async (id) => {
+  try {
+    return await db.user.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const getAllUsers = async () => {
+  try {
+    return await db.user.findMany();
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export default {
-  findUserByEmail,
   createUser,
-  findUserByUserName
-}
+  findUserByEmail,
+  findUserByUserName,
+  deleteUser,
+  getAllUsers,
+};
