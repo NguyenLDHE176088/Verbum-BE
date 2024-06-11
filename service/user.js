@@ -15,6 +15,7 @@ const getAllUsers = async () => {
         throw new Error(error);
     }
 };
+
 const createUser = async (userPayload) => {
     const transaction = await prisma.$transaction(async (prisma) => {
         try {
@@ -33,7 +34,11 @@ const createUser = async (userPayload) => {
                     }))
                 }
             };
-            console.log(convertedUserPayload.LanguageUser);
+            
+            if(convertedUserPayload.roleName !== "LINGUIST"){
+                delete convertedUserPayload.LanguageUser;
+            }
+
             const createdUser = await prisma.user.create({
                 data: convertedUserPayload
             });
@@ -59,6 +64,7 @@ const createUser = async (userPayload) => {
     });
     return transaction;
 };
+
 
 const generatePassword = (length = 20) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@_~!£';
