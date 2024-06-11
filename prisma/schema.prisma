@@ -14,38 +14,38 @@ datasource db {
 }
 
 model Role {
-  name        String                  @id
+  name        String @id
   description String
   user        User[]
 }
 
 model User {
-  id              String         @id @default(cuid())
-  firstName       String?
-  lastName        String?
-  email           String         @unique
-  userName        String?        @unique
-  emailVerified   DateTime?
-  image           String?
-  roleName        String?
-  password        String?
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  allowRejectJob  Boolean?  @default(false)
-  allowManageJobs  Boolean? @default(false)
-  allowManageUsers  Boolean? @default(false)
-  allowManageTermBase Boolean? @default(false)
-  allowViewAllProject Boolean? @default(false)
-  status          String?
-  role            Role?          @relation(fields: [roleName], references: [name])
-  accounts        Account[]
-  createdProjects Project[]      @relation("UserCreateProject")
-  onwerProjects   Project[]      @relation("UserOwnerProject")
-  UserCompany     UserCompany[]
-  Roc             Roc[]
-  UserJob         UserJob[]
-  LanguageUser    LanguageUser[]
-  UserProject     UserProject[]
+  id                  String         @id @default(cuid())
+  firstName           String?
+  lastName            String?
+  email               String         @unique
+  userName            String?        @unique
+  emailVerified       DateTime?
+  image               String?
+  roleName            String?
+  password            String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  allowRejectJob      Boolean?       @default(false)
+  allowManageJobs     Boolean?       @default(false)
+  allowManageUsers    Boolean?       @default(false)
+  allowManageTermBase Boolean?       @default(false)
+  allowViewAllProject Boolean?       @default(false)
+  status              String?
+  role                Role?          @relation(fields: [roleName], references: [name])
+  accounts            Account[]
+  createdProjects     Project[]      @relation("UserCreateProject")
+  onwerProjects       Project[]      @relation("UserOwnerProject")
+  UserCompany         UserCompany[]
+  Roc                 Roc[]
+  UserJob             UserJob[]
+  LanguageUser        LanguageUser[]
+  UserProject         UserProject[]
 }
 
 model Account {
@@ -104,17 +104,18 @@ model CompanyProject {
 }
 
 model Job {
-  id            Int          @id @default(autoincrement())
-  name          String
-  description   String?
-  status        String
-  dueDate       DateTime?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  fileExtention String
-  ProjectJob    ProjectJob[]
-  Document      Document[]
-  UserJob       UserJob[]
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  status      String
+  dueDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  fileName    String
+  projectId   Int
+  project     Project    @relation(fields: [projectId], references: [id])
+  Document    Document[]
+  UserJob     UserJob[]
 }
 
 model UserJob {
@@ -170,11 +171,11 @@ model Project {
   targetTextIdenticalQA           Boolean
   targetTextIdenticalIgnore       Boolean
   TargetLanguage                  TargetLanguage[]
-  ProjectJob                      ProjectJob[]
   CompanyProject                  CompanyProject[]
   TermBase                        TermBase[]
   Reference                       Reference[]
   UserProject                     UserProject[]
+  Job                             Job[]
 }
 
 model UserProject {
@@ -214,15 +215,6 @@ model Reference {
   project     Project @relation(fields: [projectId], references: [id])
 }
 
-model ProjectJob {
-  projectId Int
-  jobId     Int
-  project   Project @relation(fields: [projectId], references: [id])
-  job       Job     @relation(fields: [jobId], references: [id])
-
-  @@id([projectId, jobId])
-}
-
 model Document {
   id    BigInt @id @default(autoincrement())
   jobId Int
@@ -250,9 +242,9 @@ model Language {
 }
 
 model LanguageUser {
-  languageCode String 
-  userId       String 
-  type         String 
+  languageCode String
+  userId       String
+  type         String
   language     Language @relation(fields: [languageCode], references: [code])
   user         User     @relation(fields: [userId], references: [id])
 

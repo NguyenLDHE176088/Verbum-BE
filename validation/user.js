@@ -61,7 +61,7 @@ export const linguistDataValidation = async (data) => {
 }
 
 export const PMDataValidation = async (data) => {
-    const errorMessage = await linguistDataValidation(data);
+    const errorMessage = [];
     if (errorMessage.length > 0) {
         return errorMessage;
     }

@@ -2,8 +2,6 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import db from '../data/user.js';
 import { generateToken,generateRefreshToken } from '../token/token.js';
-import { createUser, findUserByEmail } from '../data/user.js';
-import { generateToken, generateRefreshToken } from '../token/token.js';
 
 const authRouter = express.Router();
 
@@ -61,7 +59,8 @@ authRouter.route('/register').post(async (req, res) => {
 
   try {
     const hashPassword = await bcrypt.hash(password, 10);
-    await createUser(name, email, hashPassword);
+    //!why create user here?
+    await db.createUser({name, email, hashPassword});
     return res.status(201).json({
       message: 'User created'
     });

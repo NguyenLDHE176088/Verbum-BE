@@ -36,7 +36,7 @@ const findUserByUserName = async (userName) => {
 }
 
 export default {
-  findUserByEmail,
   createUser,
+  findUserByEmail,
   findUserByUserName
 }
