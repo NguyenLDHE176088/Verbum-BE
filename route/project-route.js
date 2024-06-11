@@ -49,7 +49,7 @@ projectRouter.put('/', async (req, res) => {
 
 
 projectRouter.delete('/', async (req, res) => {
-  const projectIds = req.body.ids; // Giả sử yêu cầu body chứa một mảng các ID
+  const projectIds = req.body.ids; 
 
   if (!Array.isArray(projectIds) || projectIds.some(id => isNaN(parseInt(id, 10)))) {
     return res.status(400).json({ message: 'Invalid project IDs' });
