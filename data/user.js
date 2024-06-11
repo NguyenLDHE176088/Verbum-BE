@@ -1,5 +1,22 @@
 import db from '../prisma/prisma-instance.js';
 
+const updateUser = async (payload) => {
+  try {
+    const result = await db.user.update(
+      {
+        where:{
+          id: payload.id
+        },
+        data: payload
+      }
+    );
+    return result;
+
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 const createUser = async (payload) => {
   try {
     const result = await db.user.create({
@@ -34,6 +51,7 @@ const findUserByUserName = async (userName) => {
     throw new Error(error);
   }
 };
+
 const deleteUser = async (id) => {
   try {
     return await db.user.delete({
@@ -45,6 +63,7 @@ const deleteUser = async (id) => {
     throw new Error(error);
   }
 };
+
 const getAllUsers = async () => {
   try {
     return await db.user.findMany();
@@ -52,10 +71,12 @@ const getAllUsers = async () => {
     throw new Error(error);
   }
 };
+
 export default {
   createUser,
   findUserByEmail,
   findUserByUserName,
   deleteUser,
   getAllUsers,
+  updateUser
 };
