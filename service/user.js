@@ -38,7 +38,7 @@ const createUser = async (userPayload) => {
             if(convertedUserPayload.roleName !== "LINGUIST"){
                 delete convertedUserPayload.LanguageUser;
             }
-            
+
             const createdUser = await prisma.user.create({
                 data: convertedUserPayload
             });
@@ -55,8 +55,7 @@ const createUser = async (userPayload) => {
             });
 
             const mailTemplate = createUserTemplate(createdUser.email, generatedPassword);
-            // const sendMailResponse = await sendMailHelper.sendMailHelper(mailTemplate);
-
+            const sendMailResponse = await sendMailHelper.sendMailHelper(mailTemplate);
             return { createdUser, createdAccount };
         } catch (error) {
             console.error(error);
