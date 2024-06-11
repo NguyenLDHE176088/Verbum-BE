@@ -1,6 +1,5 @@
 
 import userDB from '../data/user.js'
-import accountDB from '../data/account.js'
 
 import createUserTemplate from '../mail/template/createUser.js';
 import sendMailHelper from '../service/mail.js'
@@ -15,6 +14,41 @@ const getAllUsers = async () => {
         throw new Error(error);
     }
 };
+
+const updateUser = async (updatedPayload) => {
+    try {
+        const convertedUpdatedPayload = {
+            ...updatedPayload,
+            roleName: updatedPayload.roleName.toUpperCase(),
+            LanguageUser: {
+                upsert: updatedPayload.LanguageUser.map(language => ({
+                    where: {
+                        languageCode_userId_type: {
+                            languageCode: language.languageCode.toUpperCase(),
+                            userId: updatedPayload.id,
+                            type: language.type
+                        }
+                    },
+                    update: {
+                        ...language,
+                        languageCode: language.languageCode.toUpperCase()
+                    },
+                    create: {
+                        ...language,
+                        languageCode: language.languageCode.toUpperCase()
+                    }
+                }))
+            }
+        };
+        if (convertedUpdatedPayload.roleName !== "LINGUIST") {
+            delete convertedUpdatedPayload.LanguageUser;
+        }
+        return await userDB.updateUser(convertedUpdatedPayload);
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
 
 const createUser = async (userPayload) => {
     const transaction = await prisma.$transaction(async (prisma) => {
@@ -34,8 +68,8 @@ const createUser = async (userPayload) => {
                     }))
                 }
             };
-            
-            if(convertedUserPayload.roleName !== "LINGUIST"){
+
+            if (convertedUserPayload.roleName !== "LINGUIST") {
                 delete convertedUserPayload.LanguageUser;
             }
 
@@ -86,4 +120,5 @@ export default {
     getAllUsers,
     createUser,
     deleteUser,
+    updateUser
 }

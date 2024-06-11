@@ -21,7 +21,7 @@ export const userDataValidation = async (data) => {
 
     //validate if username is valid
     if (await userDB.findUserByEmail(data.email)) {
-        errorMessage.push("username used");
+        errorMessage.push("Username used");
     }
 
     //validate if roleName valid
@@ -65,6 +65,7 @@ export const PMDataValidation = async (data) => {
     if (errorMessage.length > 0) {
         return errorMessage;
     }
+
     //check permission
     if (data?.allowViewAllProject) {
         errorMessage.push("PM doesn't have these permissions");
