@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import authRouter from './route/auth-route.js';
 import jobRouter from './route/job-route.js';
+import languageRouter from './route/languages.js';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 
@@ -22,6 +23,7 @@ app.use(cors(
 
 app.use(cookieParser());
 app.use('/auth', authRouter);
+app.use('/languages', languageRouter);
 app.use('/jobs', jobRouter);
 app.use('/users',userRouter);
 app.use('/project', projectRoute);

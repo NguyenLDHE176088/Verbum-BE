@@ -38,12 +38,12 @@ export const createProject = async (body) => {
         spellingIgnore,
         targetTextIdenticalQA,
         targetTextIdenticalIgnore,
-        targetLanguages // Thêm trường này vào body để nhận danh sách các ngôn ngữ mục tiêu
+        targetLanguages 
     } = body;
     
     try {
         // Sử dụng giao dịch để đảm bảo cả hai thao tác đều thành công hoặc đều bị hủy
-        await db.$transaction(async (prisma) => {
+        const newProject =await db.$transaction(async (prisma) => {
             // Tạo project mới
             const project = await prisma.project.create({
                 data: {
@@ -95,7 +95,10 @@ export const createProject = async (body) => {
             await prisma.targetLanguage.createMany({
                 data: targetLanguageData
             });
+            return project;
         });
+        console.log(newProject)
+        return newProject;
     } catch (error) {
         throw new Error(error.message);
     }
@@ -140,7 +143,7 @@ export const updateProject = async (id, body) => {
         spellingIgnore,
         targetTextIdenticalQA,
         targetTextIdenticalIgnore,
-        targetLanguages // Thêm trường này vào body để nhận danh sách các ngôn ngữ mục tiêu
+        targetLanguages 
     } = body;
     
     try {
