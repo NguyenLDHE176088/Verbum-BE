@@ -25,7 +25,7 @@ projectRouter.route('/:id').get(async (req, res) => {
   });
 });
 
-projectRouter.post('/create', async (req, res) => {
+projectRouter.post('/', async (req, res) => {
 
 
   try {
@@ -36,7 +36,7 @@ projectRouter.post('/create', async (req, res) => {
   }
 });
 
-projectRouter.put('/update', async (req, res) => {
+projectRouter.put('/', async (req, res) => {
 
 
   try {
@@ -48,7 +48,7 @@ projectRouter.put('/update', async (req, res) => {
 });
 
 
-projectRouter.delete('/delete', async (req, res) => {
+projectRouter.delete('/', async (req, res) => {
   const projectIds = req.body.ids; // Giả sử yêu cầu body chứa một mảng các ID
 
   if (!Array.isArray(projectIds) || projectIds.some(id => isNaN(parseInt(id, 10)))) {

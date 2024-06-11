@@ -1,11 +1,11 @@
 
-import jobDB from '../data/job.js'
+import { findJobsByProjectId as findByProjectId } from '../data/job.js'
 
 
 const findJobsByProjectId = async (projectId) => {
     try {
-        projectId = isNaN(projectId)? 0: projectId;
-        const jobResult = jobDB.findJobsByProjectId(projectId);
+        projectId = isNaN(projectId) ? 0 : projectId;
+        const jobResult = findByProjectId(projectId);
         return jobResult;
     } catch (error) {
         console.error(error);

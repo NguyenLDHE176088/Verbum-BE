@@ -104,18 +104,18 @@ model CompanyProject {
 }
 
 model Job {
-  id          Int        @id @default(autoincrement())
-  name        String
-  description String?
-  status      String
-  dueDate     DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  fileName    String
-  projectId   Int
-  project     Project    @relation(fields: [projectId], references: [id])
-  Document    Document[]
-  UserJob     UserJob[]
+  id               Int       @id @default(autoincrement())
+  name             String
+  status           String    @default("new")
+  dueDate          DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  fileExtention    String
+  targetLanguage   Language? @relation(name: "JobTargetLanguage", fields: [targetLanguageId], references: [code])
+  targetLanguageId String?
+  ProjectJob       ProjectJob[]
+  Document         Document[]
+  UserJob          UserJob[]
 }
 
 model UserJob {
@@ -128,21 +128,21 @@ model UserJob {
 }
 
 model Project {
-  id                              Int              @id @default(autoincrement())
-  name                            String
-  createBy                        String
-  description                     String
-  status                          String
-  onwer                           String
-  sourceLanguage                  String
-  createdAt                       DateTime         @default(now())
-  updatedAt                       DateTime         @updatedAt
-  createUser                      User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
-  onwerUser                       User             @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
-  langeuage                       Language         @relation(fields: [sourceLanguage], references: [code])
-  dueDate                         DateTime
-  clientName                      String
-  metadata                        String
+  id              Int             @id @default(autoincrement())
+  name            String
+  createBy        String
+  description     String
+  status          String
+  onwer           String
+  sourceLanguage  String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  createUser      User            @relation(name: "UserCreateProject", fields: [createBy], references: [id])
+  onwerUser       User            @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
+  langeuage       Language        @relation(fields: [sourceLanguage], references: [code])
+  dueDate         DateTime
+  clientName      String
+  metadata        String
   markProjectAssigned             String
   markProjectCompleted            String
   markProjectCanceled             Boolean
@@ -239,6 +239,7 @@ model Language {
   TargetLanguage TargetLanguage[]
   project        Project[]
   LanguageUser   LanguageUser[]
+  jobs           Job[]            @relation("JobTargetLanguage")
 }
 
 model LanguageUser {
