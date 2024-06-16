@@ -7,6 +7,7 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import userRouter from './route/user-route.js';
 import projectRoute from './route/project-route.js';
+import companyRoute from './route/company-route.js';
 
 const app = express();
 app.use(express.json());
@@ -24,7 +25,7 @@ app.use('/jobs', jobRouter);
 app.use('/users',userRouter);
 app.use('/jobs',jobRouter);
 app.use('/projects', projectRoute);
-
+app.use('/company',companyRoute)
 
 
 
