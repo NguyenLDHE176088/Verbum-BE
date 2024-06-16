@@ -1,4 +1,4 @@
-import { findAllLanguages } from '../data/languages.js';
+import { findAllLanguages } from '../data/language.js';
 import express from 'express';
 
 const languageRouter = express.Router();
