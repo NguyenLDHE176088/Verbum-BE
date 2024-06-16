@@ -66,7 +66,7 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([provider, providerAccountId])
+  @@id([userId])
 }
 
 model Company {
@@ -171,6 +171,7 @@ model Project {
   spellingIgnore                  Boolean
   targetTextIdenticalQA           Boolean
   targetTextIdenticalIgnore       Boolean
+  progress                        Float
   TargetLanguage                  TargetLanguage[]
   CompanyProject                  CompanyProject[]
   TermBase                        TermBase[]
