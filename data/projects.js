@@ -38,7 +38,8 @@ export const createProject = async (body) => {
         spellingIgnore,
         targetTextIdenticalQA,
         targetTextIdenticalIgnore,
-        targetLanguages 
+        targetLanguages,
+        progress
     } = body;
     
     try {
@@ -82,7 +83,8 @@ export const createProject = async (body) => {
                     spellingQA,
                     spellingIgnore,
                     targetTextIdenticalQA,
-                    targetTextIdenticalIgnore
+                    targetTextIdenticalIgnore,
+                    progress
                 }
             });
 
@@ -143,7 +145,8 @@ export const updateProject = async (id, body) => {
         spellingIgnore,
         targetTextIdenticalQA,
         targetTextIdenticalIgnore,
-        targetLanguages 
+        targetLanguages,
+        progress, 
     } = body;
     
     try {
@@ -188,7 +191,8 @@ export const updateProject = async (id, body) => {
                     spellingQA,
                     spellingIgnore,
                     targetTextIdenticalQA,
-                    targetTextIdenticalIgnore
+                    targetTextIdenticalIgnore,
+                    progress
                 }
             });
 
