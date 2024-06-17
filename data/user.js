@@ -21,7 +21,7 @@ const createUser = async (payload) => {
   try {
     const result = await db.user.create({
       data: {
-        userName: payload.userName,
+        userName: payload.username,
         email: payload.email,
         password: payload.hashPassword
       }
