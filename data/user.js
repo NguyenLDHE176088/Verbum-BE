@@ -4,7 +4,7 @@ const updateUser = async (payload) => {
   try {
     const result = await db.user.update(
       {
-        where:{
+        where: {
           id: payload.id
         },
         data: payload
@@ -15,12 +15,16 @@ const updateUser = async (payload) => {
   } catch (error) {
     throw new Error(error);
   }
-}
+};
 
 const createUser = async (payload) => {
   try {
     const result = await db.user.create({
-      data: payload,
+      data: {
+        userName: payload.userName,
+        email: payload.email,
+        password: payload.hashPassword
+      }
     });
     return result;
   } catch (error) {
@@ -32,8 +36,55 @@ const findUserByEmail = async (email) => {
   try {
     return await db.user.findUnique({
       where: {
-        email,
-      },
+        email
+      }
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const saveRefreshToken = async (userId, refreshToken) => {
+    try {
+      const exitingAccount = await db.account.findFirst({
+        where: {
+          userId: userId
+        }
+      });
+      if (exitingAccount) {
+        await db.account.delete({
+          where: {
+            userId: exitingAccount.userId
+          }
+        });
+      }
+
+      return await db.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          accounts: {
+            create: {
+              refresh_token: refreshToken,
+              provider: 'default_credential',
+              providerAccountId: 'default_credential'
+            }
+          }
+        }
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+;
+
+const findCompanyByUserId = async (userId) => {
+  try {
+    return await db.userCompany.findFirst({
+      where: {
+        userId: userId
+      }
     });
   } catch (error) {
     throw new Error(error);
@@ -44,8 +95,8 @@ const findUserByUserName = async (userName) => {
   try {
     return await db.user.findUnique({
       where: {
-        userName,
-      },
+        userName
+      }
     });
   } catch (error) {
     throw new Error(error);
@@ -56,8 +107,8 @@ const deleteUser = async (id) => {
   try {
     return await db.user.delete({
       where: {
-        id,
-      },
+        id
+      }
     });
   } catch (error) {
     throw new Error(error);
@@ -78,5 +129,7 @@ export default {
   findUserByUserName,
   deleteUser,
   getAllUsers,
-  updateUser
+  updateUser,
+  findCompanyByUserId,
+  saveRefreshToken
 };
