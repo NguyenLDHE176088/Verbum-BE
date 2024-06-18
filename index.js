@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import authRouter from './route/auth-route.js';
 import jobRouter from './route/job-route.js';
-import languageRouter from './route/languages.js';
+import languageRouter from './route/language-route.js';
 import cors from 'cors'
 import cookieParser from 'cookie-parser';
 import userRouter from './route/user-route.js';
