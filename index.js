@@ -21,7 +21,6 @@ app.use(cors(
 app.use(cookieParser());
 app.use('/auth', authRouter);
 app.use('/languages', languageRouter);
-app.use('/jobs', jobRouter);
 app.use('/users',userRouter);
 app.use('/jobs',jobRouter);
 app.use('/projects', projectRoute);
