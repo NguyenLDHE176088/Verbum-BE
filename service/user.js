@@ -1,6 +1,5 @@
 
 import userDB from '../data/user.js'
-import accountDB from '../data/account.js'
 
 import createUserTemplate from '../mail/template/createUser.js';
 import sendMailHelper from '../service/mail.js'
@@ -15,6 +14,42 @@ const getAllUsers = async () => {
         throw new Error(error);
     }
 };
+
+const updateUser = async (updatedPayload) => {
+    try {
+        const convertedUpdatedPayload = {
+            ...updatedPayload,
+            roleName: updatedPayload.roleName.toUpperCase(),
+            LanguageUser: {
+                upsert: updatedPayload.LanguageUser.map(language => ({
+                    where: {
+                        languageCode_userId_type: {
+                            languageCode: language.languageCode.toUpperCase(),
+                            userId: updatedPayload.id,
+                            type: language.type
+                        }
+                    },
+                    update: {
+                        ...language,
+                        languageCode: language.languageCode.toUpperCase()
+                    },
+                    create: {
+                        ...language,
+                        languageCode: language.languageCode.toUpperCase()
+                    }
+                }))
+            }
+        };
+        if (convertedUpdatedPayload.roleName !== "LINGUIST") {
+            delete convertedUpdatedPayload.LanguageUser;
+        }
+        return await userDB.updateUser(convertedUpdatedPayload);
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+
 const createUser = async (userPayload) => {
     const transaction = await prisma.$transaction(async (prisma) => {
         try {
@@ -33,7 +68,11 @@ const createUser = async (userPayload) => {
                     }))
                 }
             };
-            console.log(convertedUserPayload.LanguageUser);
+
+            if (convertedUserPayload.roleName !== "LINGUIST") {
+                delete convertedUserPayload.LanguageUser;
+            }
+
             const createdUser = await prisma.user.create({
                 data: convertedUserPayload
             });
@@ -50,8 +89,7 @@ const createUser = async (userPayload) => {
             });
 
             const mailTemplate = createUserTemplate(createdUser.email, generatedPassword);
-            // const sendMailResponse = await sendMailHelper.sendMailHelper(mailTemplate);
-
+            const sendMailResponse = await sendMailHelper.sendMailHelper(mailTemplate);
             return { createdUser, createdAccount };
         } catch (error) {
             console.error(error);
@@ -60,6 +98,7 @@ const createUser = async (userPayload) => {
     });
     return transaction;
 };
+
 
 const generatePassword = (length = 20) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@_~!£';
@@ -81,4 +120,5 @@ export default {
     getAllUsers,
     createUser,
     deleteUser,
+    updateUser
 }
