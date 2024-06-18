@@ -26,7 +26,7 @@ app.use('/auth', authRouter);
 app.use('/languages', languageRouter);
 app.use('/jobs', jobRouter);
 app.use('/users',userRouter);
-app.use('/project', projectRoute);
+app.use('/projects', projectRoute);
 
 const port = process.env.PORT || 8888;
 app.listen(port, () => {

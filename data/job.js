@@ -1,44 +1,53 @@
 import db from '../prisma/prisma-instance.js';
 
 // Create
-export const createJob = async (name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId) => {
+export const createJobs = async (jobs) => {
   try {
     // Use a transaction to ensure atomicity
     return await db.$transaction(async (prisma) => {
-      // Create the job
-      const job = await prisma.job.create({
-        data: {
-          name,
-          status,
-          dueDate: new Date(dueDate),
-          fileExtention,
-          targetLanguageId
-        }
-      });
+      const createdJobs = [];
 
-      // Assign users to the job
-      if (userIds && userIds.length > 0) {
-        await Promise.all(
-          userIds.map(userId =>
-            prisma.userJob.create({
-              data: {
-                userId,
-                jobId: job.id
-              }
-            })
-          )
-        );
+      // Iterate over each job in the array
+      for (const jobData of jobs) {
+        const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId } = jobData;
+
+        // Create the job
+        const job = await prisma.job.create({
+          data: {
+            name,
+            status,
+            dueDate: new Date(dueDate),
+            fileExtention,
+            targetLanguageId
+          }
+        });
+
+        // Assign users to the job
+        if (userIds && userIds.length > 0) {
+          await Promise.all(
+            userIds.map(userId =>
+              prisma.userJob.create({
+                data: {
+                  userId,
+                  jobId: job.id
+                }
+              })
+            )
+          );
+        }
+
+        // Add the job to the project
+        await prisma.projectJob.create({
+          data: {
+            projectId,
+            jobId: job.id
+          }
+        });
+
+        createdJobs.push(job);
       }
 
-      // Add the job to the project
-      await prisma.projectJob.create({
-        data: {
-          projectId,
-          jobId: job.id
-        }
-      });
-
-      return job;
+      return createdJobs;
     });
   } catch (error) {
     throw new Error(error);

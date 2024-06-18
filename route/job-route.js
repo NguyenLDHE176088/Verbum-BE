@@ -1,27 +1,23 @@
 import express from 'express';
-import { createJob, getJobById, getAllJobs, updateJob, deleteJob } from '../data/job.js';
+import { createJobs, getJobById, getAllJobs, updateJob, deleteJob } from '../data/job.js';
 
 const router = express.Router();
 
 // Create Job
 router.post('/create', async (req, res) => {
-  const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId } = req.body;
   try {
-    const job = await createJob(name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId);
-    res.status(201).json(job);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+    const jobs = req.body;
+    console.log('Received jobs:', jobs);
 
-// Get Job by ID
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const job = await getJobById(id);
-    res.status(200).json(job);
+    if (!Array.isArray(jobs)) {
+      throw new Error('Jobs must be an array');
+    }
+    const createdJobs = await createJobs(jobs);
+
+    res.status(201).json({ jobs: createdJobs });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error creating jobs:", error.message);
+    res.status(500).json({ error: "Failed to create jobs" });
   }
 });
 
