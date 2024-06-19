@@ -15,48 +15,57 @@ export const findJobsByProjectId = async (projectId) => {
 
 
 // Create
-export const createJob = async (name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId) => {
-    try {
-        // Use a transaction to ensure atomicity
-        return await db.$transaction(async (prisma) => {
-            // Create the job
-            const job = await prisma.job.create({
-                data: {
-                    name,
-                    status,
-                    dueDate: new Date(dueDate),
-                    fileExtention,
-                    targetLanguageId
-                }
-            });
+export const createJobs = async (jobs) => {
+  try {
+    // Use a transaction to ensure atomicity
+    return await db.$transaction(async (prisma) => {
+      const createdJobs = [];
 
-            // Assign users to the job
-            if (userIds && userIds.length > 0) {
-                await Promise.all(
-                    userIds.map(userId =>
-                        prisma.userJob.create({
-                            data: {
-                                userId,
-                                jobId: job.id
-                            }
-                        })
-                    )
-                );
-            }
+      // Iterate over each job in the array
+      for (const jobData of jobs) {
+        const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId } = jobData;
 
-            // Add the job to the project
-            await prisma.projectJob.create({
-                data: {
-                    projectId,
-                    jobId: job.id
-                }
-            });
-
-            return job;
+        // Create the job
+        const job = await prisma.job.create({
+          data: {
+            name,
+            status,
+            dueDate: new Date(dueDate),
+            fileExtention,
+            targetLanguageId
+          }
         });
-    } catch (error) {
-        throw new Error(error);
-    }
+
+        // Assign users to the job
+        if (userIds && userIds.length > 0) {
+          await Promise.all(
+            userIds.map(userId =>
+              prisma.userJob.create({
+                data: {
+                  userId,
+                  jobId: job.id
+                }
+              })
+            )
+          );
+        }
+
+        // Add the job to the project
+        await prisma.projectJob.create({
+          data: {
+            projectId,
+            jobId: job.id
+          }
+        });
+
+        createdJobs.push(job);
+      }
+
+      return createdJobs;
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 // Read

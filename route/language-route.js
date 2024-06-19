@@ -1,11 +1,11 @@
-import { getAllLanguage } from '../data/languages.js';
+import { findAllLanguages } from '../data/language.js';
 import express from 'express';
 
 const languageRouter = express.Router();
 
-languageRouter.get('/getAll', async (req, res) => {
+languageRouter.get('/all', async (req, res) => {
     try {
-        const languages = await getAllLanguage();
+        const languages = await findAllLanguages();
         res.status(200).json({
             message: 'Languages retrieved successfully',
             languages: languages
