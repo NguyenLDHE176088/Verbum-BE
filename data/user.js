@@ -131,6 +131,18 @@ async function getAllUsersOfCompany(userId) {
   }
 }
 
+const getUserById = async (id) => {
+  try {
+    return await db.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const deleteUser = async (id) => {
   try {
     return await db.user.delete({
@@ -149,6 +161,7 @@ export default {
   findUserByUserName,
   deleteUser,
   getAllUsersOfCompany,
+  getUserById,
   updateUser,
   findCompanyByUserId,
   saveRefreshToken,
