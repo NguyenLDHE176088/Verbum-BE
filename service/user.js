@@ -5,6 +5,7 @@ import createUserTemplate from '../mail/template/createUser.js';
 import sendMailHelper from '../service/mail.js'
 import bcrypt from "bcrypt";
 import { PrismaClient } from '@prisma/client'
+import { convertBigIntToString } from '../helpers/jsonUtils.js';
 const prisma = new PrismaClient()
 
 const getAllUsers = async () => {
@@ -66,6 +67,11 @@ const createUser = async (userPayload) => {
                         ...language,
                         languageCode: language.languageCode.toUpperCase()
                     }))
+                },
+                UserCompany: {
+                    create: userPayload.UserCompany.map(company => ({
+                        ...company
+                    }))
                 }
             };
 
@@ -74,8 +80,13 @@ const createUser = async (userPayload) => {
             }
 
             const createdUser = await prisma.user.create({
-                data: convertedUserPayload
+                data: convertedUserPayload,
+                include: {
+                    LanguageUser: true,
+                    UserCompany: true
+                }
             });
+
 
             //TODO fix when CRUD company is finished
             const accountPayLoad = {
@@ -89,7 +100,9 @@ const createUser = async (userPayload) => {
             });
 
             const mailTemplate = createUserTemplate(createdUser.email, generatedPassword);
-            const sendMailResponse = await sendMailHelper.sendMailHelper(mailTemplate);
+            await sendMailHelper.sendMailHelper(mailTemplate);
+
+            createdUser.UserCompany = convertBigIntToString(createdUser.UserCompany);
             return { createdUser, createdAccount };
         } catch (error) {
             console.error(error);
