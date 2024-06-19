@@ -22,7 +22,13 @@ companyRouter.route('/').post(async (req, res) => {
       data: {
         firstName,
         lastName,
-        role: 'ADMINISTRATOR',
+        roleName: 'ADMINISTRATOR',
+        status: 'active',
+        allowManageJobs: true,
+        allowManageUsers: true,
+        allowViewAllProjects: true,
+        allowManageTermBase: true,
+        allowRejectJob: true,
       },
     });
 
