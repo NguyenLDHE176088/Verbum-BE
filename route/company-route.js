@@ -8,8 +8,8 @@ companyRouter.route('/').post(async (req, res) => {
   try {
     const exitUser = await db.user.findUnique({
       where: {
-        id: userId
-      }
+        id: userId,
+      },
     });
     if (!exitUser) {
       return res.status(404).json({ message: 'User not found' });
@@ -17,12 +17,13 @@ companyRouter.route('/').post(async (req, res) => {
 
     const user = await db.user.update({
       where: {
-        id: userId
+        id: userId,
       },
       data: {
         firstName,
-        lastName
-      }
+        lastName,
+        role: 'ADMINISTRATOR',
+      },
     });
 
     const result = await db.$transaction(async (prisma) => {
@@ -30,8 +31,8 @@ companyRouter.route('/').post(async (req, res) => {
         data: {
           name: companyName,
           email: user.email,
-          status: 'active'
-        }
+          status: 'active',
+        },
       });
 
       const userCompany = await prisma.userCompany.create({
@@ -39,8 +40,8 @@ companyRouter.route('/').post(async (req, res) => {
           userId: userId,
           companyId: newCompany.id,
           joinDate: new Date(),
-          isHeadCompany: true
-        }
+          isHeadCompany: true,
+        },
       });
 
       return { newCompany, userCompany };
@@ -50,10 +51,9 @@ companyRouter.route('/').post(async (req, res) => {
       message: 'Company created',
       company: {
         ...result.newCompany,
-        id: result.newCompany.id.toString()
-      }
+        id: result.newCompany.id.toString(),
+      },
     });
-
   } catch (e) {
     res.status(500).json({ message: `Error creating company: ${e.message}` });
   }
