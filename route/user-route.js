@@ -18,7 +18,7 @@ userRouter.route('/').get(async (req, res) => {
       return res.status(400).json({ message: 'userId is required' });
     }
 
-    const result = await getAllUsersOfCompany(userId);
+    const result = await userService.getAllUsersOfCompany(userId);
     return res.status(200).json(result);
   } catch (e) {
     console.error(e);

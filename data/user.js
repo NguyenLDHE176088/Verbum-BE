@@ -100,7 +100,7 @@ const findUserByUserName = async (userName) => {
 
 async function getAllUsersOfCompany(userId) {
   try {
-    const userCompanies = await prisma.userCompany.findMany({
+    const userCompanies = await db.userCompany.findMany({
       where: {
         userId: userId,
       },
@@ -114,7 +114,7 @@ async function getAllUsersOfCompany(userId) {
     );
 
     // Step 2: Retrieve all users associated with the company(ies)
-    const users = await prisma.userCompany.findMany({
+    const users = await db.userCompany.findMany({
       where: {
         companyId: {
           in: companyIds,
