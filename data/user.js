@@ -2,16 +2,13 @@ import db from '../prisma/prisma-instance.js';
 
 const updateUser = async (payload) => {
   try {
-    const result = await db.user.update(
-      {
-        where: {
-          id: payload.id
-        },
-        data: payload
-      }
-    );
+    const result = await db.user.update({
+      where: {
+        id: payload.id,
+      },
+      data: payload,
+    });
     return result;
-
   } catch (error) {
     throw new Error(error);
   }
@@ -23,8 +20,8 @@ const createUser = async (payload) => {
       data: {
         userName: payload.username,
         email: payload.email,
-        password: payload.hashPassword
-      }
+        password: payload.hashPassword,
+      },
     });
     return result;
   } catch (error) {
@@ -36,8 +33,8 @@ const findUserByEmail = async (email) => {
   try {
     return await db.user.findUnique({
       where: {
-        email
-      }
+        email,
+      },
     });
   } catch (error) {
     throw new Error(error);
@@ -45,46 +42,44 @@ const findUserByEmail = async (email) => {
 };
 
 const saveRefreshToken = async (userId, refreshToken) => {
-    try {
-      const exitingAccount = await db.account.findFirst({
+  try {
+    const exitingAccount = await db.account.findFirst({
+      where: {
+        userId: userId,
+      },
+    });
+    if (exitingAccount) {
+      await db.account.delete({
         where: {
-          userId: userId
-        }
-      });
-      if (exitingAccount) {
-        await db.account.delete({
-          where: {
-            userId: exitingAccount.userId
-          }
-        });
-      }
-
-      return await db.user.update({
-        where: {
-          id: userId
+          userId: exitingAccount.userId,
         },
-        data: {
-          accounts: {
-            create: {
-              refresh_token: refreshToken,
-              provider: 'default_credential',
-              providerAccountId: 'default_credential'
-            }
-          }
-        }
       });
-    } catch (error) {
-      throw new Error(error);
     }
-  }
-;
 
+    return await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        accounts: {
+          create: {
+            refresh_token: refreshToken,
+            provider: 'default_credential',
+            providerAccountId: 'default_credential',
+          },
+        },
+      },
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 const findCompanyByUserId = async (userId) => {
   try {
     return await db.userCompany.findFirst({
       where: {
-        userId: userId
-      }
+        userId: userId,
+      },
     });
   } catch (error) {
     throw new Error(error);
@@ -95,29 +90,54 @@ const findUserByUserName = async (userName) => {
   try {
     return await db.user.findUnique({
       where: {
-        userName
-      }
+        userName,
+      },
     });
   } catch (error) {
     throw new Error(error);
   }
 };
+
+async function getAllUsersOfCompany(userId) {
+  try {
+    const userCompanies = await prisma.userCompany.findMany({
+      where: {
+        userId: userId,
+      },
+      select: {
+        companyId: true,
+      },
+    });
+
+    const companyIds = userCompanies.map(
+      (userCompany) => userCompany.companyId,
+    );
+
+    // Step 2: Retrieve all users associated with the company(ies)
+    const users = await prisma.userCompany.findMany({
+      where: {
+        companyId: {
+          in: companyIds,
+        },
+      },
+      select: {
+        user: true,
+      },
+    });
+
+    return users.map((userCompany) => userCompany.user);
+  } catch (error) {
+    throw new Error(error);
+  }
+}
 
 const deleteUser = async (id) => {
   try {
     return await db.user.delete({
       where: {
-        id
-      }
+        id,
+      },
     });
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const getAllUsers = async () => {
-  try {
-    return await db.user.findMany();
   } catch (error) {
     throw new Error(error);
   }
@@ -128,8 +148,8 @@ export default {
   findUserByEmail,
   findUserByUserName,
   deleteUser,
-  getAllUsers,
+  getAllUsersOfCompany,
   updateUser,
   findCompanyByUserId,
-  saveRefreshToken
+  saveRefreshToken,
 };

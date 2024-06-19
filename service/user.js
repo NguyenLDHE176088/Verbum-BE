@@ -7,13 +7,13 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
-const getAllUsers = async () => {
+const getAllUsersOfCompany = async (userId) => {
     try {
-        return await userDB.getAllUsers();
+        return await userDB.getAllUsersOfCompany(userId);
     } catch (error) {
         throw new Error(error);
     }
-};
+}
 
 const updateUser = async (updatedPayload) => {
     try {
@@ -117,7 +117,7 @@ const deleteUser = async (id) => {
     }
 };
 export default {
-    getAllUsers,
+    getAllUsersOfCompany,
     createUser,
     deleteUser,
     updateUser

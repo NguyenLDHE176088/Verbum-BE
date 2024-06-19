@@ -12,10 +12,16 @@ const userRouter = express.Router();
 
 userRouter.route('/').get(async (req, res) => {
   try {
-    const result = await userService.getAllUsers();
+    const userId = req.query.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'userId is required' });
+    }
+
+    const result = await getAllUsersOfCompany(userId);
     return res.status(200).json(result);
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return res.status(500).json({
       message: e.message,
     });
@@ -61,7 +67,7 @@ userRouter.route('/create').post(async (req, res) => {
 
 userRouter.route('/update').put(async (req, res) => {
   const body = req.body;
-  const validationRulesIgnore = ["Email used", "Username used"];
+  const validationRulesIgnore = ['Email used', 'Username used'];
 
   //validation step
   let errorMessage = await userDataValidation(body);
@@ -82,7 +88,9 @@ userRouter.route('/update').put(async (req, res) => {
   }
 
   //ignore some validation rules
-  errorMessage = errorMessage.filter(rule => !validationRulesIgnore.includes(rule));
+  errorMessage = errorMessage.filter(
+    (rule) => !validationRulesIgnore.includes(rule),
+  );
 
   if (errorMessage.length > 0) {
     return res.status(400).json({
