@@ -1,18 +1,11 @@
 import userDB from '../data/user.js';
 
 import createUserTemplate from '../mail/template/createUser.js';
-<<<<<<< HEAD
 import sendMailHelper from '../service/mail.js'
 import bcrypt from "bcrypt";
 import { PrismaClient } from '@prisma/client'
 import { convertBigIntToString } from '../helpers/jsonUtils.js';
 const prisma = new PrismaClient()
-=======
-import sendMailHelper from '../service/mail.js';
-import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
->>>>>>> develop
 
 const getAllUsersOfCompany = async (userId) => {
   try {
