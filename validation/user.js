@@ -6,8 +6,13 @@ const languageTypes = ["source_language", "target_language"];
 export const userDataValidation = async (data) => {
     const errorMessage = [];
     //validate if some not null attributes is missing
-    if (!data?.firstName || !data?.lastName || !data?.userName || !data?.email || !data?.roleName || !data?.status || !data?.UserCompany) {
+    if (!data?.firstName || !data?.lastName || !data?.userName || !data?.email || !data?.roleName || !data?.status ) {
         errorMessage.push("Field(s) missing");
+        return errorMessage;
+    }
+
+    if(!data?.UserCompany){
+        errorMessage.push("Company missing");
         return errorMessage;
     }
     ///validate company

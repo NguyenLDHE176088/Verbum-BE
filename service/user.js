@@ -24,71 +24,16 @@ const getUserById = async (id) => {
 
 const updateUser = async (updatedPayload) => {
   try {
+    const { UserCompany, LanguageUser, ...dataToUpdate } = updatedPayload;
     const convertedUpdatedPayload = {
-      ...updatedPayload,
-      roleName: updatedPayload.roleName.toUpperCase(),
-      LanguageUser: {
-        upsert: updatedPayload.LanguageUser.map(language => ({
-          where: {
-            languageCode_userId_type: {
-              languageCode: language.languageCode.toUpperCase(),
-              userId: updatedPayload.id,
-              type: language.type
-            }
-          },
-          update: {
-            languageCode: language.languageCode.toUpperCase(),
-            type: language.type
-          },
-          create: {
-            languageCode: language.languageCode.toUpperCase(),
-            userId: updatedPayload.id,
-            type: language.type
-          }
-        }))
-      },
-      UserCompany: {
-        upsert: updatedPayload.UserCompany.map(company => ({
-          where: {
-            userId_companyId: {
-              userId: updatedPayload.id,
-              companyId: company.companyId,
-            }
-          },
-          update: {
-            joinDate: new Date(company.joinDate),
-            outDate: company.outDate ? new Date(company.outDate) : null,
-            isHeadCompany: company.isHeadCompany
-          },
-          create: {
-            userId: updatedPayload.id,
-            companyId: company.companyId,
-            joinDate: new Date(company.joinDate),
-            outDate: company.outDate ? new Date(company.outDate) : null,
-            isHeadCompany: company.isHeadCompany
-          }
-        }))
-      },
+      ...dataToUpdate,
+      roleName: updatedPayload.roleName.toUpperCase()
     };
-
-    if (convertedUpdatedPayload.roleName !== "LINGUIST") {
-      delete convertedUpdatedPayload.LanguageUser;
-    }
 
     const updatedUser = await prisma.user.update({
       where: { id: updatedPayload.id },
-      data: convertedUpdatedPayload,
-      include: {
-        LanguageUser: true,
-        UserCompany: true
-      }
+      data: convertedUpdatedPayload
     });
-
-    // Convert BigInt to String
-    updatedUser.UserCompany = updatedUser.UserCompany.map(company => ({
-      ...company,
-      companyId: company.companyId.toString()
-    }));
 
     return updatedUser;
   } catch (error) {
