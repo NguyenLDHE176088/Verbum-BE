@@ -250,7 +250,7 @@ model LanguageUser {
   userId       String
   type         String
   language     Language @relation(fields: [languageCode], references: [code])
-  user         User     @relation(fields: [userId], references: [id])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([languageCode, userId, type])
 }
