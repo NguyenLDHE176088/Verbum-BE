@@ -82,11 +82,11 @@ const createUser = async (userPayload) => {
       //TODO fix when CRUD company is finished
       const accountPayLoad = {
         userId: createdUser.id,
-        type: createdUser.UserCompany[0].companyId,
-        provider: createdUser.UserCompany[0].companyId,
+        type: createdUser.UserCompany[0].companyId.toString(),
+        provider: createdUser.UserCompany[0].companyId.toString(),
         providerAccountId: createdUser.id
       }
-      
+
       const createdAccount = await prisma.account.create({
         data: accountPayLoad
       });
