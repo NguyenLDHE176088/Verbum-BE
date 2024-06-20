@@ -1,10 +1,11 @@
 import userDB from '../data/user.js';
 
 import createUserTemplate from '../mail/template/createUser.js';
-import sendMailHelper from '../service/mail.js';
-import bcrypt from 'bcrypt';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import sendMailHelper from '../service/mail.js'
+import bcrypt from "bcrypt";
+import { PrismaClient } from '@prisma/client'
+import { convertBigIntToString } from '../helpers/jsonUtils.js';
+const prisma = new PrismaClient()
 
 const getAllUsersOfCompany = async (userId) => {
   try {
@@ -23,58 +24,46 @@ const getUserById = async (id) => {
 
 const updateUser = async (updatedPayload) => {
   try {
+    const { UserCompany, LanguageUser, ...dataToUpdate } = updatedPayload;
     const convertedUpdatedPayload = {
-      ...updatedPayload,
-      roleName: updatedPayload.roleName.toUpperCase(),
-      LanguageUser: {
-        upsert: updatedPayload.LanguageUser.map((language) => ({
-          where: {
-            languageCode_userId_type: {
-              languageCode: language.languageCode.toUpperCase(),
-              userId: updatedPayload.id,
-              type: language.type,
-            },
-          },
-          update: {
-            ...language,
-            languageCode: language.languageCode.toUpperCase(),
-          },
-          create: {
-            ...language,
-            languageCode: language.languageCode.toUpperCase(),
-          },
-        })),
-      },
+      ...dataToUpdate,
+      roleName: updatedPayload.roleName.toUpperCase()
     };
-    if (convertedUpdatedPayload.roleName !== 'LINGUIST') {
-      delete convertedUpdatedPayload.LanguageUser;
-    }
-    return await userDB.updateUser(convertedUpdatedPayload);
+
+    const updatedUser = await prisma.user.update({
+      where: { id: updatedPayload.id },
+      data: convertedUpdatedPayload
+    });
+
+    return updatedUser;
   } catch (error) {
     throw new Error(error);
   }
 };
+
 
 const createUser = async (userPayload) => {
   const transaction = await prisma.$transaction(async (prisma) => {
     try {
       // Generate password
       const generatedPassword = generatePassword();
-      const hashedPassword = await bcrypt.hash(
-        generatedPassword,
-        +process.env.SALT,
-      );
+      const hashedPassword = await bcrypt.hash(generatedPassword, +process.env.SALT);
       userPayload.password = hashedPassword;
       // Convert language users
       const convertedUserPayload = {
         ...userPayload,
         roleName: userPayload.roleName.toUpperCase(),
         LanguageUser: {
-          create: userPayload.LanguageUser.map((language) => ({
+          create: userPayload.LanguageUser.map(language => ({
             ...language,
-            languageCode: language.languageCode.toUpperCase(),
-          })),
+            languageCode: language.languageCode.toUpperCase()
+          }))
         },
+        UserCompany: {
+          create: userPayload.UserCompany.map(company => ({
+            ...company
+          }))
+        }
       };
 
       if (convertedUserPayload.roleName !== 'LINGUIST') {
@@ -83,25 +72,29 @@ const createUser = async (userPayload) => {
 
       const createdUser = await prisma.user.create({
         data: convertedUserPayload,
+        include: {
+          LanguageUser: true,
+          UserCompany: true
+        }
       });
+
 
       //TODO fix when CRUD company is finished
       const accountPayLoad = {
         userId: createdUser.id,
-        type: 'company name',
-        provider: 'Verbum',
-        providerAccountId: createdUser.id,
-      };
+        type: createdUser.UserCompany[0].companyId.toString(),
+        provider: createdUser.UserCompany[0].companyId.toString(),
+        providerAccountId: createdUser.id
+      }
+
       const createdAccount = await prisma.account.create({
-        data: accountPayLoad,
+        data: accountPayLoad
       });
 
-      const mailTemplate = createUserTemplate(
-        createdUser.email,
-        generatedPassword,
-      );
-      const sendMailResponse =
-        await sendMailHelper.sendMailHelper(mailTemplate);
+      const mailTemplate = createUserTemplate(createdUser.email, generatedPassword);
+      await sendMailHelper.sendMailHelper(mailTemplate);
+
+      createdUser.UserCompany = convertBigIntToString(createdUser.UserCompany);
       return { createdUser, createdAccount };
     } catch (error) {
       console.error(error);
