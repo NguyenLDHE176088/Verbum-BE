@@ -117,6 +117,7 @@ model Job {
   UserJob          UserJob[]
   Project          Project?   @relation(fields: [projectId], references: [id])
   projectId        Int?
+  documentUrl      String?    @default("url")
 }
 
 model UserJob {

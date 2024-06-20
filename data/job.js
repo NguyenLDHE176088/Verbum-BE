@@ -16,65 +16,59 @@ export const findJobsByProjectId = async (projectId) => {
 
 // Create
 export const createJobs = async (jobs) => {
-  try {
-    // Use a transaction to ensure atomicity
-    return await db.$transaction(async (prisma) => {
-      const createdJobs = [];
+    try {
+        // Use a transaction to ensure atomicity
+        return await db.$transaction(async (prisma) => {
+            const createdJobs = [];
 
-      // Iterate over each job in the array
-      for (const jobData of jobs) {
-        const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId } = jobData;
+            // Iterate over each job in the array
+            for (const jobData of jobs) {
+                const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId } = jobData;
 
-        // Create the job
-        const job = await prisma.job.create({
-          data: {
-            name,
-            status,
-            dueDate: new Date(dueDate),
-            fileExtention,
-            targetLanguageId
-          }
-        });
+                // Create the job
+                const job = await prisma.job.create({
+                    data: {
+                        name,
+                        status,
+                        dueDate: new Date(dueDate),
+                        fileExtention,
+                        targetLanguageId,
+                        projectId
+                    }
+                });
 
-        // Assign users to the job
-        if (userIds && userIds.length > 0) {
-          await Promise.all(
-            userIds.map(userId =>
-              prisma.userJob.create({
-                data: {
-                  userId,
-                  jobId: job.id
+                // Assign users to the job
+                if (userIds && userIds.length > 0) {
+                    await Promise.all(
+                        userIds.map(userId =>
+                            prisma.userJob.create({
+                                data: {
+                                    userId,
+                                    jobId: job.id
+                                }
+                            })
+                        )
+                    );
                 }
-              })
-            )
-          );
-        }
+                createdJobs.push(job);
+            }
 
-        // Add the job to the project
-        await prisma.projectJob.create({
-          data: {
-            projectId,
-            jobId: job.id
-          }
+            return createdJobs;
         });
-
-        createdJobs.push(job);
-      }
-
-      return createdJobs;
-    });
-  } catch (error) {
-    throw new Error(error);
-  }
+    } catch (error) {
+        throw new Error(error);
+    }
 };
 
 // Read
 export const getJobById = async (id) => {
     try {
-        return await db.job.findUnique({
-            where: {
-                id
-            }
+        return await db.$transaction(async (prisma) => {
+            return await db.job.findUnique({
+                where: {
+                    id
+                }
+            });
         });
     } catch (error) {
         throw new Error(error);
@@ -83,7 +77,11 @@ export const getJobById = async (id) => {
 
 export const getAllJobs = async () => {
     try {
-        return await db.job.findMany();
+        return await db.$transaction(async (prisma) => {
+            const jobs = await prisma.job.findMany({});
+            return jobs;
+        });
+
     } catch (error) {
         throw new Error(error);
     }
