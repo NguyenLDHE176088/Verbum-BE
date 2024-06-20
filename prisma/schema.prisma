@@ -89,7 +89,7 @@ model UserCompany {
   outDate       DateTime?
   isHeadCompany Boolean
   company       Company   @relation(fields: [companyId], references: [id])
-  user          User      @relation(fields: [userId], references: [id])
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, companyId])
 }

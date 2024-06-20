@@ -28,6 +28,18 @@ userRouter.route('/').get(async (req, res) => {
     });
   }
 });
+userRouter.route('/:id').get(async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await userService.getUserById(id);
+    return res.status(200).json(result);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      message: e.message,
+    });
+  }
+});
 
 userRouter.route('/create').post(async (req, res) => {
   const body = req.body;
