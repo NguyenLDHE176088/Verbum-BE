@@ -5,32 +5,21 @@ const languageTypes = ["source_language", "target_language"];
 
 export const userDataValidation = async (data) => {
     const errorMessage = [];
+    
     //validate if some not null attributes is missing
-    if (!data?.firstName || !data?.lastName || !data?.userName || !data?.email || !data?.roleName || !data?.status ) {
+    if (!data?.firstName || !data?.lastName || !data?.userName || !data?.email || !data?.roleName || !data?.status || !data?.creatorId) {
         errorMessage.push("Field(s) missing");
         return errorMessage;
     }
 
-    if(!data?.UserCompany){
-        errorMessage.push("Company missing");
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(data.joinDate)) {
+        errorMessage.push("Invalid joinDate. Expected ISO-8601 DateTime");
         return errorMessage;
     }
-    ///validate company
-    if (data.UserCompany.length == 0 || !Array.isArray(data.UserCompany)) {
-        errorMessage.push("Users are not being assigned to any company!");
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(data.outDate)) {
+        errorMessage.push("Invalid joinDate. Expected ISO-8601 DateTime");
         return errorMessage;
     }
-
-    data.UserCompany.forEach(company => {
-        if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(company.joinDate)) {
-            errorMessage.push("Invalid joinDate. Expected ISO-8601 DateTime");
-            return errorMessage;
-        }
-        if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(company.outDate)) {
-            errorMessage.push("Invalid joinDate. Expected ISO-8601 DateTime");
-            return errorMessage;
-        }
-    });
 
     // validate if email is valid
     if (!/\S+@\S+\.\S+/.test(data.email)) {
@@ -52,8 +41,6 @@ export const userDataValidation = async (data) => {
     if (!validRoles.includes(data.roleName.toUpperCase()) || Array.isArray(data.roleName)) {
         errorMessage.push("Invalid role");
     }
-
-
 
     return errorMessage;
 }
