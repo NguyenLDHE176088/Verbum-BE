@@ -7,16 +7,12 @@ export const userDataValidation = async (data) => {
     const errorMessage = [];
     
     //validate if some not null attributes is missing
-    if (!data?.firstName || !data?.lastName || !data?.userName || !data?.email || !data?.roleName || !data?.status || !data?.creatorId) {
+    if (!data?.firstName || !data?.lastName || !data?.userName || !data?.email || !data?.roleName || !data?.status || !data?.creatorId || !data?.joinDate) {
         errorMessage.push("Field(s) missing");
         return errorMessage;
     }
-
+    
     if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(data.joinDate)) {
-        errorMessage.push("Invalid joinDate. Expected ISO-8601 DateTime");
-        return errorMessage;
-    }
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(data.outDate)) {
         errorMessage.push("Invalid joinDate. Expected ISO-8601 DateTime");
         return errorMessage;
     }

@@ -7,7 +7,6 @@ import {
 } from '../validation/user.js';
 import userService from '../service/user.js';
 import 'dotenv/config'
-import { jsonReplacer } from '../helpers/jsonUtils.js';
 
 const userRouter = express.Router();
 
