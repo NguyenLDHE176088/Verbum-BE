@@ -5,6 +5,7 @@ import sendMailHelper from '../service/mail.js'
 import bcrypt from "bcrypt";
 import { PrismaClient } from '@prisma/client'
 import { convertBigIntToString } from '../helpers/jsonUtils.js';
+import { findCompanyByUserId } from '../data/userCompany.js';
 const prisma = new PrismaClient()
 
 const getAllUsersOfCompany = async (userId) => {
@@ -46,23 +47,38 @@ const createUser = async (userPayload) => {
   const transaction = await prisma.$transaction(async (prisma) => {
     try {
       // Generate password
+      const { creatorId, joinDate, outDate, ...userData } = userPayload;
+
       const generatedPassword = generatePassword();
       const hashedPassword = await bcrypt.hash(generatedPassword, +process.env.SALT);
-      userPayload.password = hashedPassword;
-      // Convert language users
+      userData.password = hashedPassword;
+
+      // get companyInfo
+      const company = await findCompanyByUserId(creatorId);
+
+      console.log(company);
+
+      if (!company) {
+        throw Error("No company found!");
+      }
+
+      const companyData = {
+        companyId: company.companyId.toString(),
+        joinDate,
+        outDate,
+        isHeadCompany: false 
+      }
       const convertedUserPayload = {
-        ...userPayload,
-        roleName: userPayload.roleName.toUpperCase(),
+        ...userData,
+        roleName: userData.roleName.toUpperCase(),
         LanguageUser: {
-          create: userPayload.LanguageUser.map(language => ({
+          create: userData.LanguageUser.map(language => ({
             ...language,
             languageCode: language.languageCode.toUpperCase()
           }))
         },
         UserCompany: {
-          create: userPayload.UserCompany.map(company => ({
-            ...company
-          }))
+          create: companyData
         }
       };
 
@@ -79,11 +95,10 @@ const createUser = async (userPayload) => {
       });
 
 
-      //TODO fix when CRUD company is finished
       const accountPayLoad = {
         userId: createdUser.id,
         type: createdUser.UserCompany[0].companyId.toString(),
-        provider: createdUser.UserCompany[0].companyId.toString(),
+        provider: creatorId,
         providerAccountId: createdUser.id
       }
 
