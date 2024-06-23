@@ -47,7 +47,7 @@ const createUser = async (userPayload) => {
   const transaction = await prisma.$transaction(async (prisma) => {
     try {
       // Generate password
-      const { creatorId, joinDate, outDate, ...userData } = userPayload;
+      const { creatorId, joinDate,outDate, ...userData } = userPayload;
 
       const generatedPassword = generatePassword();
       const hashedPassword = await bcrypt.hash(generatedPassword, +process.env.SALT);
@@ -66,8 +66,9 @@ const createUser = async (userPayload) => {
         companyId: company.companyId.toString(),
         joinDate,
         outDate,
-        isHeadCompany: false 
-      }
+        isHeadCompany: false
+      };
+      
       const convertedUserPayload = {
         ...userData,
         roleName: userData.roleName.toUpperCase(),
