@@ -5,6 +5,10 @@ const companyRouter = express.Router();
 
 companyRouter.route('/').post(async (req, res) => {
   const { userId, firstName, lastName, companyName } = req.body;
+
+  let companyData = {
+    name: companyName
+  };
   try {
     const exitUser = await db.user.findUnique({
       where: {
@@ -15,30 +19,32 @@ companyRouter.route('/').post(async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const user = await db.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        firstName,
-        lastName,
-        roleName: 'ADMINISTRATOR',
-        status: 'active',
-        allowManageJobs: true,
-        allowManageUsers: true,
-        allowViewAllProjects: true,
-        allowManageTermBase: true,
-        allowRejectJob: true,
-      },
-    });
-
     const result = await db.$transaction(async (prisma) => {
-      const newCompany = await prisma.company.create({
-        data: {
-          name: companyName,
-          email: user.email,
-          status: 'active',
+      const user = await prisma.user.update({
+        where: {
+          id: userId,
         },
+        data: {
+          firstName,
+          lastName,
+          roleName: 'ADMINISTRATOR',  // Ensure this matches your Role model
+          status: 'active',
+          allowManageJobs: true,
+          allowManageUsers: true,
+          allowViewAllProject: true,  // This should be allowViewAllProject not allowViewAllProjects based on your schema
+          allowManageTermBase: true,
+          allowRejectJob: true,
+        },
+      });
+
+      companyData = {
+        ...companyData,
+        email: user.email,
+        status: 'active'
+      }
+
+      const newCompany = await prisma.company.create({
+        data: companyData
       });
 
       const userCompany = await prisma.userCompany.create({
@@ -49,10 +55,8 @@ companyRouter.route('/').post(async (req, res) => {
           isHeadCompany: true,
         },
       });
-
       return { newCompany, userCompany };
     });
-
     res.status(201).json({
       message: 'Company created',
       company: {
@@ -61,6 +65,7 @@ companyRouter.route('/').post(async (req, res) => {
       },
     });
   } catch (e) {
+    console.error(e);
     res.status(500).json({ message: `Error creating company: ${e.message}` });
   }
 });

@@ -42,7 +42,6 @@ router.post('/create', async (req, res) => {
 // Get All Jobs
 router.get('/', async (req, res) => {
   try {
-    console.log("not here");
     const jobs = await getAllJobs();
     res.status(200).json(jobs);
   } catch (error) {
