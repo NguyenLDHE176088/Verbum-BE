@@ -117,7 +117,7 @@ model Job {
   UserJob          UserJob[]
   Project          Project?   @relation(fields: [projectId], references: [id])
   projectId        Int?
-  documentUrl      String?    @default("url")
+  documentUrl      String?
 }
 
 model UserJob {
@@ -129,57 +129,57 @@ model UserJob {
   @@id([userId, jobId])
 }
 
-  model Project {
-    id                              Int              @id @default(autoincrement())
-    name                            String
-    createBy                        String
-    description                     String
-    status                          String
-    owner                           String
-    sourceLanguage                  String
-    createdAt                       DateTime         @default(now())
-    updatedAt                       DateTime         @updatedAt
-    createUser                      User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
-    ownerUser                       User             @relation(name: "UserOwnerProject", fields: [owner], references: [id])
-    language                       Language         @relation(fields: [sourceLanguage], references: [code])
-    dueDate                         DateTime
-    clientName                      String
-    metadata                        String
-    markProjectAssigned             String
-    markProjectCompleted            String
-    markProjectCanceled             Boolean
-    emptyTargetQA                   Boolean
-    emptyTargetIgnore               Boolean
-    extraNumberInTargetQA           Boolean
-    extraNumberInTargetIgnore       Boolean
-    inconsistentInTargetQA           Boolean
-    inconsistentInTargetIgnore       Boolean
-    leadingAndTrailingSpaceQA       Boolean
-    leadingAndTrailingSpaceIgnore   Boolean
-    maxTargetLengthPercentage       Int?
-    maxTargetLengthPercentageQA     Boolean
-    maxTargetLengthPercentageIgnore Boolean
-    maxTargetLengthCharacter        Int?
-    maxTargetLengthCharacterQA      Boolean
-    maxTargetLengthCharacterIgnore  Boolean
-    missingNumberQA                 Boolean
-    missingNumberIgnore             Boolean
-    missingSpaceQA                  Boolean
-    missingSpaceIgnore              Boolean
-    repeatedWordQA                  Boolean
-    repeatedWordIgnore              Boolean
-    spellingQA                      Boolean
-    spellingIgnore                  Boolean
-    targetTextIdenticalQA           Boolean
-    targetTextIdenticalIgnore       Boolean
-    progress                        Float
-    TargetLanguage                  TargetLanguage[]
-    CompanyProject                  CompanyProject[]
-    TermBase                        TermBase[]
-    Reference                       Reference[]
-    UserProject                     UserProject[]
-    Job                             Job[]
-  }
+model Project {
+  id                              Int              @id @default(autoincrement())
+  name                            String
+  createBy                        String
+  description                     String
+  status                          String
+  owner                           String
+  sourceLanguage                  String
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+  createUser                      User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
+  ownerUser                       User             @relation(name: "UserOwnerProject", fields: [owner], references: [id])
+  language                        Language         @relation(fields: [sourceLanguage], references: [code])
+  dueDate                         DateTime
+  clientName                      String
+  metadata                        String
+  markProjectAssigned             String
+  markProjectCompleted            String
+  markProjectCanceled             Boolean
+  emptyTargetQA                   Boolean
+  emptyTargetIgnore               Boolean
+  extraNumberInTargetQA           Boolean
+  extraNumberInTargetIgnore       Boolean
+  inconsistentInTargetQA          Boolean
+  inconsistentInTargetIgnore      Boolean
+  leadingAndTrailingSpaceQA       Boolean
+  leadingAndTrailingSpaceIgnore   Boolean
+  maxTargetLengthPercentage       Int?
+  maxTargetLengthPercentageQA     Boolean
+  maxTargetLengthPercentageIgnore Boolean
+  maxTargetLengthCharacter        Int?
+  maxTargetLengthCharacterQA      Boolean
+  maxTargetLengthCharacterIgnore  Boolean
+  missingNumberQA                 Boolean
+  missingNumberIgnore             Boolean
+  missingSpaceQA                  Boolean
+  missingSpaceIgnore              Boolean
+  repeatedWordQA                  Boolean
+  repeatedWordIgnore              Boolean
+  spellingQA                      Boolean
+  spellingIgnore                  Boolean
+  targetTextIdenticalQA           Boolean
+  targetTextIdenticalIgnore       Boolean
+  progress                        Float
+  TargetLanguage                  TargetLanguage[]
+  CompanyProject                  CompanyProject[]
+  TermBase                        TermBase[]
+  Reference                       Reference[]
+  UserProject                     UserProject[]
+  Job                             Job[]
+}
 
 model UserProject {
   userId    String
