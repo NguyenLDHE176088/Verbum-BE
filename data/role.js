@@ -1,3 +1,4 @@
+import db from "../prisma/prisma-instance.js";
 
 
 export const findAllRoles = async () => {
