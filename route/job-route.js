@@ -3,24 +3,24 @@ import { createJobs, getJobById, getAllJobs, updateJob, deleteJob } from '../dat
 import jobService from '../service/job.js';
 
 const router = express.Router();
+
 //get all Job by projectId
-// router.route('/').get(async (req, res) => {
-//     try {
-//         const projectId = parseInt(req.query.projectId);
-//         const jobs = await jobService.findJobsByProjectId(projectId);
-//         if (jobs.length === 0) {
-//             return res.status(204).json([]);
-//         } else {
-//             return res.status(200).json(jobs);
-//         }
-//     }
-//     catch (e) {
-//         console.log(e);
-//         return res.status(500).json({
-//             message: e.message
-//         });
-//     }
-// });
+router.route('/:projectId').get(async (req, res) => {
+  try {
+    const projectId = parseInt(req.params.projectId);
+    const jobs = await jobService.findJobsByProjectId(projectId);
+    console.log(jobs);
+    return res.status(jobs.length === 0 ? 204 : 200).json({
+      data: jobs.length === 0 ? [] : jobs
+    });
+  }
+  catch (e) {
+    return res.status(500).json({
+      message: e.message
+    });
+  }
+});
+
 // Create Job
 router.post('/create', async (req, res) => {
   try {
@@ -42,6 +42,7 @@ router.post('/create', async (req, res) => {
 // Get All Jobs
 router.get('/', async (req, res) => {
   try {
+    console.log("not here");
     const jobs = await getAllJobs();
     res.status(200).json(jobs);
   } catch (error) {
