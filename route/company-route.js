@@ -1,5 +1,6 @@
 import express from 'express';
 import db from '../prisma/prisma-instance.js';
+import { findCompanyByUserId } from '../data/userCompany.js';
 
 const companyRouter = express.Router();
 
@@ -62,6 +63,16 @@ companyRouter.route('/').post(async (req, res) => {
     });
   } catch (e) {
     res.status(500).json({ message: `Error creating company: ${e.message}` });
+  }
+});
+
+companyRouter.get('/find-by-user-id', async (req, res) => {
+  try {
+    const userId = req.query.userId;
+    const companies = await findCompanyByUserId(userId);
+    res.status(200).json(companies);
+  } catch (e) {
+    res.status(500).json({ message: `Error getting companies: ${e.message}` });
   }
 });
 

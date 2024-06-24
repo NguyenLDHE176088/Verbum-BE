@@ -84,7 +84,7 @@ userRouter.route('/create').post(async (req, res) => {
 
 userRouter.route('/update').put(async (req, res) => {
   const body = req.body;
-  const validationRulesIgnore = ['Email used', 'Username used', 'Company missing','Linguist must specify their languages'];
+  const validationRulesIgnore = ['Email used', 'Username used', 'Company missing', 'Linguist must specify their languages'];
 
   //validation step
   let errorMessage = await userDataValidation(body);

@@ -66,7 +66,7 @@ const createUser = async (userPayload) => {
         companyId: company.companyId.toString(),
         joinDate,
         outDate,
-        isHeadCompany: false 
+        isHeadCompany: false
       }
       const convertedUserPayload = {
         ...userData,
@@ -136,6 +136,7 @@ const deleteUser = async (id) => {
     throw new Error(error);
   }
 };
+
 export default {
   getAllUsersOfCompany,
   getUserById,

@@ -141,7 +141,7 @@ model Project {
   updatedAt                       DateTime         @updatedAt
   createUser                      User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
   onwerUser                       User             @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
-  langeuage                       Language         @relation(fields: [sourceLanguage], references: [code])
+  language                       Language         @relation(fields: [sourceLanguage], references: [code])
   dueDate                         DateTime
   clientName                      String
   metadata                        String

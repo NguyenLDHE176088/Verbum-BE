@@ -155,6 +155,53 @@ const deleteUser = async (id) => {
   }
 };
 
+export const findUsersBySourceAndTargetLanguage = async (
+  companyId,
+  sourceLanguageCode,
+  targetLanguageCode,
+) => {
+  try {
+    const result = await db.user.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+      },
+      where: {
+        AND: [
+          {
+            LanguageUser: {
+              some: {
+                languageCode: sourceLanguageCode,
+                type: 'source',
+              },
+            },
+          },
+          {
+            LanguageUser: {
+              some: {
+                languageCode: targetLanguageCode,
+                type: 'target',
+              },
+            },
+          },
+          {
+            UserCompany: {
+              some: {
+                companyId: companyId,
+              },
+            },
+          },
+          { status: 'ACTIVE' },
+        ],
+      },
+    });
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export default {
   createUser,
   findUserByEmail,

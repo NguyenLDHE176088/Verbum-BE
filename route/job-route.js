@@ -1,26 +1,9 @@
 import express from 'express';
 import { createJobs, getJobById, getAllJobs, updateJob, deleteJob } from '../data/job.js';
-import jobService from '../service/job.js';
+import { buildUsersBySourceAndTargetLanguage } from '../service/job.js';
 
 const router = express.Router();
-//get all Job by projectId
-// router.route('/').get(async (req, res) => {
-//     try {
-//         const projectId = parseInt(req.query.projectId);
-//         const jobs = await jobService.findJobsByProjectId(projectId);
-//         if (jobs.length === 0) {
-//             return res.status(204).json([]);
-//         } else {
-//             return res.status(200).json(jobs);
-//         }
-//     }
-//     catch (e) {
-//         console.log(e);
-//         return res.status(500).json({
-//             message: e.message
-//         });
-//     }
-// });
+
 // Create Job
 router.post('/create', async (req, res) => {
   try {
@@ -69,6 +52,22 @@ router.delete('/:id', async (req, res) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/find-by-source-target-language', async (req, res) => {
+  console.log('find-by-source-target-language');
+  try {
+    const companyId = req.query.companyId;
+    const sourceLanguageCode = req.query.sourceLanguageCode;
+    const targetLanguageCode = req.query.targetLanguageCode;
+    const result = await buildUsersBySourceAndTargetLanguage(companyId, sourceLanguageCode, targetLanguageCode);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: error.message,
+    });
   }
 });
 
