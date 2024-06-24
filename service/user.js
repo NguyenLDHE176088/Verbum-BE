@@ -134,6 +134,7 @@ const deleteUser = async (id) => {
     throw new Error(error);
   }
 };
+
 export default {
   getAllUsersOfCompany,
   getUserById,
