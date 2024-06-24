@@ -1,5 +1,5 @@
 import express from 'express';
-import { createJobs, getJobById, getAllJobs, updateJob, deleteJob } from '../data/job.js';
+import { createJobs, getJobById, getAllJobs, updateJob, deleteJob, findJobsByProjectId } from '../data/job.js';
 import { buildUsersBySourceAndTargetLanguage } from '../service/job.js';
 
 const router = express.Router();
@@ -22,6 +22,25 @@ router.post('/create', async (req, res) => {
   }
 });
 
+//get all Job by projectId
+router.route('/:projectId').get(async (req, res) => {
+    try {
+        const projectId = parseInt(req.params.projectId);
+        const jobs = await findJobsByProjectId(projectId);
+        if (jobs.length === 0) {
+            return res.status(204).json([]);
+        } else {
+            return res.status(200).json(jobs);
+        }
+    }
+    catch (e) {
+        console.log(e);
+        return res.status(500).json({
+            message: e.message
+        });
+    }
+});
+
 // Get All Jobs
 router.get('/', async (req, res) => {
   try {
@@ -31,6 +50,8 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
 
 // Update Job
 router.put('/update/:id', async (req, res) => {
