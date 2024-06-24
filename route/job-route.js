@@ -56,7 +56,6 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/find-by-source-target-language', async (req, res) => {
-  console.log('find-by-source-target-language');
   try {
     const companyId = req.query.companyId;
     const sourceLanguageCode = req.query.sourceLanguageCode;
