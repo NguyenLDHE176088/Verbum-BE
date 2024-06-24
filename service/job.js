@@ -6,7 +6,7 @@ import { findLanguageByCode } from '../data/language.js';
 const findJobsByProjectId = async (projectId) => {
     try {
         projectId = isNaN(projectId) ? 0 : projectId;
-        const jobResult = findByProjectId(projectId);
+        const jobResult = await findByProjectId(projectId);
         return jobResult;
     } catch (error) {
         console.error(error);

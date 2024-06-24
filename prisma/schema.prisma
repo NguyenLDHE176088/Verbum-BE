@@ -40,7 +40,7 @@ model User {
   role                Role?          @relation(fields: [roleName], references: [name])
   accounts            Account[]
   createdProjects     Project[]      @relation("UserCreateProject")
-  onwerProjects       Project[]      @relation("UserOwnerProject")
+  ownerProjects       Project[]      @relation("UserOwnerProject")
   UserCompany         UserCompany[]
   Roc                 Roc[]
   UserJob             UserJob[]
@@ -117,7 +117,7 @@ model Job {
   UserJob          UserJob[]
   Project          Project?   @relation(fields: [projectId], references: [id])
   projectId        Int?
-  documentUrl      String?    
+  documentUrl      String?
 }
 
 model UserJob {
@@ -135,13 +135,13 @@ model Project {
   createBy                        String
   description                     String
   status                          String
-  onwer                           String
+  owner                           String
   sourceLanguage                  String
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
   createUser                      User             @relation(name: "UserCreateProject", fields: [createBy], references: [id])
-  onwerUser                       User             @relation(name: "UserOwnerProject", fields: [onwer], references: [id])
-  language                       Language         @relation(fields: [sourceLanguage], references: [code])
+  ownerUser                       User             @relation(name: "UserOwnerProject", fields: [owner], references: [id])
+  language                        Language         @relation(fields: [sourceLanguage], references: [code])
   dueDate                         DateTime
   clientName                      String
   metadata                        String
@@ -152,8 +152,8 @@ model Project {
   emptyTargetIgnore               Boolean
   extraNumberInTargetQA           Boolean
   extraNumberInTargetIgnore       Boolean
-  inconsistenInTargetQA           Boolean
-  inconsistenInTargetIgnore       Boolean
+  inconsistentInTargetQA          Boolean
+  inconsistentInTargetIgnore      Boolean
   leadingAndTrailingSpaceQA       Boolean
   leadingAndTrailingSpaceIgnore   Boolean
   maxTargetLengthPercentage       Int?
