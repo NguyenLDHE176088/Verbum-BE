@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Create Job
 router.post('/create', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   try {
     const jobs = req.body;
     console.log('Received jobs:', jobs);
@@ -23,7 +24,7 @@ router.post('/create', async (req, res) => {
 });
 
 router.get('/find-by-source-target-language', async (req, res) => {
-  console.log('find-by-source-target-language');
+  // #swagger.tags = ['Jobs']
   try {
     const companyId = req.query.companyId;
     const sourceLanguageCode = req.query.sourceLanguageCode;
@@ -40,25 +41,27 @@ router.get('/find-by-source-target-language', async (req, res) => {
 
 //get all Job by projectId
 router.route('/:projectId').get(async (req, res) => {
-    try {
-        const projectId = parseInt(req.params.projectId);
-        const jobs = await findJobsByProjectId(projectId);
-        if (jobs.length === 0) {
-            return res.status(204).json([]);
-        } else {
-            return res.status(200).json(jobs);
-        }
+  // #swagger.tags = ['Jobs']
+  try {
+    const projectId = parseInt(req.params.projectId);
+    const jobs = await findJobsByProjectId(projectId);
+    if (jobs.length === 0) {
+      return res.status(204).json([]);
+    } else {
+      return res.status(200).json(jobs);
     }
-    catch (e) {
-        console.log(e);
-        return res.status(500).json({
-            message: e.message
-        });
-    }
+  }
+  catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      message: e.message
+    });
+  }
 });
 
 // Get All Jobs
 router.get('/', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   try {
     const jobs = await getAllJobs();
     res.status(200).json(jobs);
@@ -67,11 +70,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-
-
-
 // Update Job
 router.put('/update/:id', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   const { id } = req.params;
   const { dueDate, userIds } = req.body;
   try {
@@ -84,6 +85,7 @@ router.put('/update/:id', async (req, res) => {
 
 // Delete Job
 router.delete('/:id', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   const { id } = req.params;
   try {
     await deleteJob(id);

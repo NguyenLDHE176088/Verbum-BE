@@ -13,6 +13,7 @@ const userRouter = express.Router();
 
 // Route to get all users of a company
 userRouter.route('/').get(async (req, res) => {
+  // #swagger.tags = ['Users']
   try {
     const userId = req.query.userId;
 
@@ -30,6 +31,7 @@ userRouter.route('/').get(async (req, res) => {
 
 // Route to create a user
 userRouter.route('/create').post(async (req, res) => {
+  // #swagger.tags = ['Users']
   const body = req.body;
 
   // Validation step
@@ -69,6 +71,7 @@ userRouter.route('/create').post(async (req, res) => {
 
 // Route to update a user
 userRouter.route('/update').put(async (req, res) => {
+  // #swagger.tags = ['Users']
   const body = req.body;
   const validationRulesIgnore = [
     'Email used',
@@ -116,6 +119,7 @@ userRouter.route('/update').put(async (req, res) => {
 
 // Route to get a specific user by ID
 userRouter.route('/:id').get(async (req, res) => {
+  // #swagger.tags = ['Users']
   const id = req.params.id;
   try {
     const result = await userService.getUserById(id);
@@ -128,6 +132,7 @@ userRouter.route('/:id').get(async (req, res) => {
 
 // Route to delete a user by ID
 userRouter.route('/:id').delete(async (req, res) => {
+  // #swagger.tags = ['Users']
   const id = req.params.id;
   try {
     const result = await userService.deleteUser(id);

@@ -7,8 +7,6 @@ export const findCompanyByUserId = async (userId) => {
                 userId: userId
             }
         });
-        console.log(data);
-
         // Convert BigInt values to strings
         if (data && data.companyId) {
             data.companyId = data.companyId.toString();

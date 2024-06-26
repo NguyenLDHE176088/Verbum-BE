@@ -6,6 +6,7 @@ import { generateToken, generateRefreshToken } from '../token/token.js';
 const authRouter = express.Router();
 
 authRouter.route('/login').post(async (req, res) => {
+  // #swagger.tags = ['Auth']
   try {
     const { email, password } = req.body;
     let isHasCompany = false;
@@ -74,6 +75,7 @@ authRouter.route('/login').post(async (req, res) => {
 });
 
 authRouter.route('/register').post(async (req, res) => {
+  // #swagger.tags = ['Auth']
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
     return res.status(400).json({
