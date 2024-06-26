@@ -5,6 +5,7 @@ import { findCompanyByUserId } from '../data/userCompany.js';
 const companyRouter = express.Router();
 
 companyRouter.route('/').post(async (req, res) => {
+  // #swagger.tags = ['Company']
   const { userId, firstName, lastName, companyName } = req.body;
 
   let companyData = {
@@ -72,6 +73,7 @@ companyRouter.route('/').post(async (req, res) => {
 });
 
 companyRouter.get('/find-by-user-id', async (req, res) => {
+  // #swagger.tags = ['Company']
   try {
     const userId = req.query.userId;
     const companies = await findCompanyByUserId(userId);

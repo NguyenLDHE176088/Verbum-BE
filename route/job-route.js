@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Create Job
 router.post('/create', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   try {
     const jobs = req.body;
     console.log('Received jobs:', jobs);
@@ -24,6 +25,7 @@ router.post('/create', async (req, res) => {
 
 // Get All Jobs
 router.get('/', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   try {
     const jobs = await getAllJobs();
     res.status(200).json(jobs);
@@ -34,6 +36,7 @@ router.get('/', async (req, res) => {
 
 // Update Job
 router.put('/update/:id', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   const { id } = req.params;
   const { dueDate, userIds } = req.body;
   try {
@@ -46,6 +49,7 @@ router.put('/update/:id', async (req, res) => {
 
 // Delete Job
 router.delete('/:id', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   const { id } = req.params;
   try {
     await deleteJob(id);
@@ -56,6 +60,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 router.get('/find-by-source-target-language', async (req, res) => {
+  // #swagger.tags = ['Jobs']
   try {
     const companyId = req.query.companyId;
     const sourceLanguageCode = req.query.sourceLanguageCode;

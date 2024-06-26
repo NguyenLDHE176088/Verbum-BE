@@ -6,6 +6,7 @@ import projectService from "../service/project.js"
 const projectRouter = express.Router();
 
 projectRouter.route('/').get(async (req, res) => {
+  // #swagger.tags = ['Projects']
   const projects = await db.project.findMany();
   res.status(200).json({
     status: 'success',
@@ -14,6 +15,7 @@ projectRouter.route('/').get(async (req, res) => {
 });
 
 projectRouter.route('/:id').get(async (req, res) => {
+  // #swagger.tags = ['Projects']
   const id = parseInt(req.params.id);
   let project = await db.project.findUnique({
     where: {
@@ -32,6 +34,7 @@ projectRouter.route('/:id').get(async (req, res) => {
 });
 
 projectRouter.post('/', async (req, res) => {
+  // #swagger.tags = ['Projects']
   try {
     const newProject = await createProject(req.body);
     res.status(201).json({ message: 'Project created', project: newProject });
@@ -42,8 +45,7 @@ projectRouter.post('/', async (req, res) => {
 });
 
 projectRouter.put('/', async (req, res) => {
-
-
+  // #swagger.tags = ['Projects']
   try {
     const newProject = await updateProject(req.params, req.body);
     res.status(201).json({ message: 'Project updated', project: newProject });
@@ -54,6 +56,7 @@ projectRouter.put('/', async (req, res) => {
 
 
 projectRouter.delete('/', async (req, res) => {
+  // #swagger.tags = ['Projects']
   const projectIds = req.body.ids;
 
   if (!Array.isArray(projectIds) || projectIds.some(id => isNaN(parseInt(id, 10)))) {
@@ -72,6 +75,7 @@ projectRouter.delete('/', async (req, res) => {
 });
 
 projectRouter.route('/references/:id').get(async (req, res) => {
+  // #swagger.tags = ['Projects']
   try {
     const id = parseInt(req.params.id);
     let data = await projectService.getReferencesByProjectId(id);

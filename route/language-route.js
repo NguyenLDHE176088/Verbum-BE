@@ -4,6 +4,7 @@ import express from 'express';
 const languageRouter = express.Router();
 
 languageRouter.get('/all', async (req, res) => {
+    // #swagger.tags = ['Languages']
     try {
         const languages = await findAllLanguages();
         res.status(200).json({
@@ -19,6 +20,7 @@ languageRouter.get('/all', async (req, res) => {
 });
 
 languageRouter.get('/source-language/', async (req, res) => {
+    // #swagger.tags = ['Languages']
     const projectId = parseInt(req.query.projectId);
     try {
         const sourceLanguages = await findSourceLanguageByProjectId(projectId);
@@ -32,6 +34,7 @@ languageRouter.get('/source-language/', async (req, res) => {
 });
 
 languageRouter.get('/target-language/', async (req, res) => {
+    // #swagger.tags = ['Languages']
     const projectId = parseInt(req.query.projectId);
     try {
         const targetLanguages = await findTargetLanguageByProjectId(projectId);

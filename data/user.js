@@ -173,7 +173,7 @@ export const findUsersBySourceAndTargetLanguage = async (
             LanguageUser: {
               some: {
                 languageCode: sourceLanguageCode,
-                type: 'source',
+                type: 'source_language',
               },
             },
           },
@@ -181,7 +181,7 @@ export const findUsersBySourceAndTargetLanguage = async (
             LanguageUser: {
               some: {
                 languageCode: targetLanguageCode,
-                type: 'target',
+                type: 'target_language',
               },
             },
           },
@@ -192,7 +192,7 @@ export const findUsersBySourceAndTargetLanguage = async (
               },
             },
           },
-          { status: 'ACTIVE' },
+          { status: 'active' },
         ],
       },
     });
