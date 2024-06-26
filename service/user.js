@@ -3,10 +3,9 @@ import userDB from '../data/user.js';
 import createUserTemplate from '../mail/template/createUser.js';
 import sendMailHelper from '../service/mail.js'
 import bcrypt from "bcrypt";
-import { PrismaClient } from '@prisma/client'
 import { convertBigIntToString } from '../helpers/jsonUtils.js';
 import { findCompanyByUserId } from '../data/userCompany.js';
-const prisma = new PrismaClient()
+import db from '../prisma/prisma-instance.js';
 
 const getAllUsersOfCompany = async (userId) => {
   try {
@@ -31,7 +30,7 @@ const updateUser = async (updatedPayload) => {
       roleName: updatedPayload.roleName.toUpperCase()
     };
 
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await db.user.update({
       where: { id: updatedPayload.id },
       data: convertedUpdatedPayload
     });
@@ -44,50 +43,50 @@ const updateUser = async (updatedPayload) => {
 
 
 const createUser = async (userPayload) => {
-  const transaction = await prisma.$transaction(async (prisma) => {
-    try {
-      // Generate password
-      const { creatorId, joinDate,outDate, ...userData } = userPayload;
+  try {
+    let createdUser;
+    let createdAccount;
+    // Generate password
+    const { creatorId, joinDate, outDate, ...userData } = userPayload;
 
-      const generatedPassword = generatePassword();
-      const hashedPassword = await bcrypt.hash(generatedPassword, +process.env.SALT);
-      userData.password = hashedPassword;
+    const generatedPassword = generatePassword();
+    const hashedPassword = await bcrypt.hash(generatedPassword, +process.env.SALT);
+    userData.password = hashedPassword;
 
-      // get companyInfo
-      const company = await findCompanyByUserId(creatorId);
+    // get companyInfo
+    const company = await findCompanyByUserId(creatorId);
+    if (!company) {
+      throw Error("No company found!");
+    }
 
-      console.log(company);
+    const companyData = {
+      companyId: company.companyId.toString(),
+      joinDate,
+      outDate,
+      isHeadCompany: false
+    };
 
-      if (!company) {
-        throw Error("No company found!");
+    const convertedUserPayload = {
+      ...userData,
+      roleName: userData.roleName.toUpperCase(),
+      LanguageUser: {
+        create: userData.LanguageUser.map(language => ({
+          ...language,
+          languageCode: language.languageCode.toUpperCase()
+        }))
+      },
+      UserCompany: {
+        create: companyData
       }
+    };
 
-      const companyData = {
-        companyId: company.companyId.toString(),
-        joinDate,
-        outDate,
-        isHeadCompany: false
-      };
-      
-      const convertedUserPayload = {
-        ...userData,
-        roleName: userData.roleName.toUpperCase(),
-        LanguageUser: {
-          create: userData.LanguageUser.map(language => ({
-            ...language,
-            languageCode: language.languageCode.toUpperCase()
-          }))
-        },
-        UserCompany: {
-          create: companyData
-        }
-      };
+    if (convertedUserPayload.roleName !== 'LINGUIST') {
+      delete convertedUserPayload.LanguageUser;
+    }
 
-      if (convertedUserPayload.roleName !== 'LINGUIST') {
-        delete convertedUserPayload.LanguageUser;
-      }
+    const transaction = await db.$transaction(async (db) => {
 
-      const createdUser = await prisma.user.create({
+      createdUser = await db.user.create({
         data: convertedUserPayload,
         include: {
           LanguageUser: true,
@@ -103,21 +102,19 @@ const createUser = async (userPayload) => {
         providerAccountId: createdUser.id
       }
 
-      const createdAccount = await prisma.account.create({
+      createdAccount = await db.account.create({
         data: accountPayLoad
-      });
+      })
+    });
 
-      const mailTemplate = createUserTemplate(createdUser.email, generatedPassword);
-      await sendMailHelper.sendMailHelper(mailTemplate);
-
-      createdUser.UserCompany = convertBigIntToString(createdUser.UserCompany);
-      return { createdUser, createdAccount };
-    } catch (error) {
-      console.error(error);
-      throw error; // Rethrow the error to rollback the transaction
-    }
-  });
-  return transaction;
+    const mailTemplate = createUserTemplate(createdUser.email, generatedPassword);
+    await sendMailHelper.sendMailHelper(mailTemplate);
+    createdUser.UserCompany = convertBigIntToString(createdUser.UserCompany);
+    return { createdUser, createdAccount };
+  } catch (error) {
+    console.error(error);
+    throw error; // Rethrow the error to rollback the transaction
+  }
 };
 
 const generatePassword = (length = 20) => {

@@ -23,7 +23,7 @@ export const createJobs = async (jobs) => {
 
             // Iterate over each job in the array
             for (const jobData of jobs) {
-                const { name, status, dueDate, fileExtention, userIds, projectId, targetLanguageId, documentUrl } = jobData;
+                const { name, status, dueDate, fileExtension, userIds, projectId, targetLanguageId, documentUrl } = jobData;
 
                 // Create the job
                 const job = await prisma.job.create({
@@ -31,7 +31,7 @@ export const createJobs = async (jobs) => {
                         name,
                         status,
                         dueDate: new Date(dueDate),
-                        fileExtention,
+                        fileExtension,
                         targetLanguageId,
                         projectId,
                         documentUrl

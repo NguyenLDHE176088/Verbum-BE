@@ -280,6 +280,63 @@
         }
       }
     },
+    "/jobs/find-by-source-target-language": {
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "sourceLanguageCode",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "targetLanguageCode",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/jobs/{projectId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/jobs/": {
       "get": {
         "tags": [
@@ -352,39 +409,6 @@
         "responses": {
           "204": {
             "description": "No Content"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/jobs/find-by-source-target-language": {
-      "get": {
-        "tags": [
-          "Jobs"
-        ],
-        "description": "",
-        "parameters": [
-          {
-            "name": "companyId",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "sourceLanguageCode",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "targetLanguageCode",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           },
           "500": {
             "description": "Internal Server Error"

@@ -110,7 +110,7 @@ model Job {
   dueDate          DateTime?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
-  fileExtention    String
+  fileExtension    String
   targetLanguage   Language?  @relation(name: "JobTargetLanguage", fields: [targetLanguageId], references: [code])
   targetLanguageId String?
   Document         Document[]

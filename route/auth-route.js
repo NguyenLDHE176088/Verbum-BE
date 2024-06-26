@@ -24,9 +24,10 @@ authRouter.route('/login').post(async (req, res) => {
       });
     }
 
-    const exitingCompany = await db.findCompanyByUserId(user.id);
-    if (exitingCompany) {
+    const existingCompany = await db.findCompanyByUserId(user.id);
+    if (existingCompany) {
       isHasCompany = true;
+
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -82,8 +83,8 @@ authRouter.route('/register').post(async (req, res) => {
     });
   }
 
-  const exitingUser = await db.findUserByEmail(email);
-  if (exitingUser) {
+  const existingUser = await db.findUserByEmail(email);
+  if (existingUser) {
     return res.status(400).json({
       message: 'Email already in use'
     });
