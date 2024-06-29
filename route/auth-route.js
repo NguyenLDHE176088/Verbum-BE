@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import db from '../data/user.js';
-import { generateToken, generateRefreshToken } from '../token/token.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken } from '../token/token.js';
 
 const authRouter = express.Router();
 
@@ -104,4 +104,42 @@ authRouter.route('/register').post(async (req, res) => {
   }
 });
 
+authRouter.route('/refresh-token').post(async (req, res) => {
+  // #swagger.tags = ['Auth']
+  const { refToken } = req.body;
+  if (!refToken) {
+    return res.status(400).json({
+      message: 'Refresh token is required'
+    });
+  }
+  try {
+    const payload = verifyRefreshToken(refToken);
+    const user = await db.findUserByEmail(payload.email);
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found'
+      });
+    }
+    const newPayload = {
+      id: user.id,
+      email: user.email
+    };
+    const token = generateToken(newPayload);
+    const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      expires: tokenExpiry
+    });
+    return res.status(200).json({
+      message: 'Token refreshed',
+      token: token
+    });
+  } catch (e) {
+    return res.status(500).json({
+      message: `Error refreshing token ${e}`
+    });
+  }
+});
 export default authRouter;
