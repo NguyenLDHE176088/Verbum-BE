@@ -1,6 +1,8 @@
 import db from '../prisma/prisma-instance.js';
+import userService from '../service/user.js';
 
 export const createProject = async (body) => {
+    const { clientEmail, allowCreateGuestAccount } = body;
     const {
         name,
         createBy,
@@ -41,10 +43,23 @@ export const createProject = async (body) => {
         targetLanguages,
         progress
     } = body;
-    
+
+    //create guest 
+    const guestData = {
+        creatorId: createBy,
+        firstName: clientName,
+        lastName: "",
+        userName: clientEmail.split('@')[0],
+        email: clientEmail,
+        allowRejectJob: false,
+        status: "active",
+        joinDate: new Date().toISOString(),
+        roleName: "GUEST"
+    }
+
     try {
         // Sử dụng giao dịch để đảm bảo cả hai thao tác đều thành công hoặc đều bị hủy
-        const newProject =await db.$transaction(async (prisma) => {
+        const newProject = await db.$transaction(async (prisma) => {
             // Tạo project mới
             const project = await prisma.project.create({
                 data: {
@@ -97,8 +112,15 @@ export const createProject = async (body) => {
             await prisma.targetLanguage.createMany({
                 data: targetLanguageData
             });
+
+            //section for creating guest
+            if (allowCreateGuestAccount) {
+                const guest = await userService.createUser(guestData);
+                console.log("Guest user created successfully");
+            }
             return project;
         });
+
         console.log(newProject)
         return newProject;
     } catch (error) {
@@ -146,9 +168,9 @@ export const updateProject = async (id, body) => {
         targetTextIdenticalQA,
         targetTextIdenticalIgnore,
         targetLanguages,
-        progress, 
+        progress,
     } = body;
-    
+
     try {
         // Sử dụng giao dịch để đảm bảo cả hai thao tác đều thành công hoặc đều bị hủy
         await db.$transaction(async (prisma) => {

@@ -1,7 +1,8 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import db from '../data/user.js';
-import { generateToken, generateRefreshToken, verifyRefreshToken } from '../token/token.js';
+import { generateToken, generateRefreshToken, verifyRefreshToken, getDataFromToken } from '../token/token.js';
+import { getCookie } from '../helpers/cookiesUtils.js';
 
 const authRouter = express.Router();
 
@@ -92,7 +93,6 @@ authRouter.route('/register').post(async (req, res) => {
 
   try {
     const hashPassword = await bcrypt.hash(password, 10);
-    //!why create user here?
     await db.createUser({ username, email, hashPassword });
     return res.status(201).json({
       message: 'User created'
@@ -142,4 +142,44 @@ authRouter.route('/refresh-token').post(async (req, res) => {
     });
   }
 });
+
+authRouter.route('/logout').post(async (req, res) => {
+  // #swagger.tags = ['Auth']
+  try {
+    const cookies = getCookie(req);
+    let refreshToken;
+
+    // Find the refreshToken in cookies array
+    cookies.forEach(cookie => {
+      if (cookie.includes('refToken=')) {
+        refreshToken = cookie.split('=')[1];
+      }
+    });
+
+    const decode = getDataFromToken(refreshToken);
+    const user = await db.getUserByEmail(!decode.email || null);
+
+    // Handle case where refreshToken isn't found
+    if (!refreshToken) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Refresh token not found in cookies'
+      });
+    }
+
+    // Proceed with removing refreshToken
+    await db.removeRefreshToken(user.id, refreshToken);
+    res.status(200).json({
+      status: 'success',
+      message: 'Logged out successfully'
+    });
+  } catch (e) {
+    console.error('Error logging out:', e);
+    res.status(500).json({
+      status: 'error',
+      message: `Error logging out: ${e}`
+    });
+  }
+});
+
 export default authRouter;
