@@ -39,7 +39,6 @@ projectRouter.post('/', async (req, res) => {
     const newProject = await createProject(req.body);
     res.status(201).json({ message: 'Project created', project: newProject });
   } catch (e) {
-    console.log(e);
     res.status(500).json({ message: `Error creating project: ${e.message}` });
   }
 });

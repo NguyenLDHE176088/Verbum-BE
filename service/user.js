@@ -66,15 +66,10 @@ const createUser = async (userPayload) => {
       isHeadCompany: false
     };
 
-    const convertedUserPayload = {
+
+    let convertedUserPayload = {
       ...userData,
       roleName: userData.roleName.toUpperCase(),
-      LanguageUser: {
-        create: userData.LanguageUser.map(language => ({
-          ...language,
-          languageCode: language.languageCode.toUpperCase()
-        }))
-      },
       UserCompany: {
         create: companyData
       }
@@ -82,6 +77,16 @@ const createUser = async (userPayload) => {
 
     if (convertedUserPayload.roleName !== 'LINGUIST') {
       delete convertedUserPayload.LanguageUser;
+    } else {
+      convertedUserPayload = {
+        ...convertedUserPayload,
+        LanguageUser: {
+          create: userData.LanguageUser.map(language => ({
+            ...language,
+            languageCode: language.languageCode.toUpperCase()
+          }))
+        }
+      };
     }
 
     const transaction = await db.$transaction(async (db) => {

@@ -98,6 +98,18 @@ const findUserByUserName = async (userName) => {
   }
 };
 
+const getUserByEmail = async (email) => {
+  try {
+    return await db.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 async function getAllUsersOfCompany(userId) {
   try {
     const userCompanies = await db.userCompany.findMany({
@@ -155,6 +167,21 @@ const deleteUser = async (id) => {
   }
 };
 
+const removeRefreshToken = async (userId, refToken) => {
+  try {
+    return await db.account.update({
+      where: {
+        userId,
+        refresh_token: refToken,
+      }, data: {
+        refresh_token: null
+      }
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
 export const findUsersBySourceAndTargetLanguage = async (
   companyId,
   sourceLanguageCode,
@@ -203,7 +230,9 @@ export const findUsersBySourceAndTargetLanguage = async (
 };
 
 export default {
+  getUserByEmail,
   createUser,
+  removeRefreshToken,
   findUserByEmail,
   findUserByUserName,
   deleteUser,
