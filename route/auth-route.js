@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import db from '../data/user.js';
 import { generateToken, generateRefreshToken, verifyRefreshToken, getDataFromToken } from '../token/token.js';
-import { getCookie } from '../helpers/cookiesUtils.js';
+import { getCookie, getTokenFromCookie } from '../helpers/cookiesUtils.js';
 
 const authRouter = express.Router();
 
@@ -147,14 +147,7 @@ authRouter.route('/logout').post(async (req, res) => {
   // #swagger.tags = ['Auth']
   try {
     const cookies = getCookie(req);
-    let refreshToken;
-
-    // Find the refreshToken in cookies array
-    cookies.forEach(cookie => {
-      if (cookie.includes('refToken=')) {
-        refreshToken = cookie.split('=')[1];
-      }
-    });
+    let refreshToken = getTokenFromCookie(cookies,"refToken");
 
     const decode = getDataFromToken(refreshToken);
     const user = await db.getUserByEmail(!decode.email || null);

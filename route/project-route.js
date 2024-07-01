@@ -2,11 +2,17 @@ import express from 'express';
 import db from '../prisma/prisma-instance.js';
 import { createProject, deleteProject, updateProject } from '../data/projects.js';
 import projectService from "../service/project.js"
+import { getCookie, getTokenFromCookie } from '../helpers/cookiesUtils.js';
+import { getDataFromToken } from '../token/token.js';
 
 const projectRouter = express.Router();
 
 projectRouter.route('/').get(async (req, res) => {
   // #swagger.tags = ['Projects']
+  const cookies = getCookie(req);
+  const token = getTokenFromCookie(cookies, "token");
+  const decode = getDataFromToken(token);
+
   const projects = await db.project.findMany();
   res.status(200).json({
     status: 'success',
