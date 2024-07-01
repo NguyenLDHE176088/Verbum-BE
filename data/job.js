@@ -2,12 +2,33 @@ import db from '../prisma/prisma-instance.js';
 
 export const findJobsByProjectId = async (projectId) => {
     try {
-        const data = await db.job.findMany({
+        let jobs = await db.job.findMany({
             where: {
                 projectId: + projectId
+            }, include: {
+                Project: true,
+
             }
         });
-        return data;
+        jobs = await Promise.all(jobs.map(async (data) => {
+            const { Project } = data;
+            const { sourceLanguage, owner } = Project;
+            const user = await db.user.findUnique({
+                where: {
+                    id: owner
+                }
+            });  // Assuming findUserById returns a user object with a userName property
+            const { userName } = user;
+            delete data.Project;
+            return {
+                ...data,
+                sourceLanguage,
+                provider: userName,  // Use userName from the user object
+                progress: 0
+            }
+        }));
+
+        return jobs;
     } catch (error) {
         throw new Error(error);
     }

@@ -45,6 +45,8 @@ router.route('/:projectId').get(async (req, res) => {
   try {
     const projectId = parseInt(req.params.projectId);
     const jobs = await findJobsByProjectId(projectId);
+    
+
     if (jobs.length === 0) {
       return res.status(204).json([]);
     } else {

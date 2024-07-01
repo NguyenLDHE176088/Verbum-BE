@@ -14,9 +14,10 @@ datasource db {
 }
 
 model Role {
-  name        String @id
+  name        String        @id
   description String
   user        User[]
+  UserCompany UserCompany[]
 }
 
 model User {
@@ -27,7 +28,6 @@ model User {
   userName            String?        @unique
   emailVerified       DateTime?
   image               String?
-  roleName            String?
   password            String?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
@@ -37,7 +37,6 @@ model User {
   allowManageTermBase Boolean?       @default(false)
   allowViewAllProject Boolean?       @default(false)
   status              String?
-  role                Role?          @relation(fields: [roleName], references: [name])
   accounts            Account[]
   createdProjects     Project[]      @relation("UserCreateProject")
   ownerProjects       Project[]      @relation("UserOwnerProject")
@@ -46,6 +45,8 @@ model User {
   UserJob             UserJob[]
   LanguageUser        LanguageUser[]
   UserProject         UserProject[]
+  role                Role?          @relation(fields: [roleName], references: [name])
+  roleName            String?
 }
 
 model Account {
@@ -87,8 +88,10 @@ model UserCompany {
   companyId     BigInt
   joinDate      DateTime
   outDate       DateTime?
+  roleName      String?
   isHeadCompany Boolean
   company       Company   @relation(fields: [companyId], references: [id])
+  role          Role?     @relation(fields: [roleName], references: [name])
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, companyId])
@@ -121,10 +124,11 @@ model Job {
 }
 
 model UserJob {
-  userId String
-  jobId  Int
-  user   User   @relation(fields: [userId], references: [id])
-  job    Job    @relation(fields: [jobId], references: [id])
+  userId  String
+  jobId   Int
+  jobRole String
+  user    User   @relation(fields: [userId], references: [id])
+  job     Job    @relation(fields: [jobId], references: [id])
 
   @@id([userId, jobId])
 }
@@ -186,6 +190,7 @@ model UserProject {
   projectId Int
   joinDate  DateTime
   outDate   DateTime?
+  isGuest   Boolean
   user      User      @relation(fields: [userId], references: [id])
   project   Project   @relation(fields: [projectId], references: [id])
 
