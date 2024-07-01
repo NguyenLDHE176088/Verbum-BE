@@ -125,13 +125,6 @@ authRouter.route('/refresh-token').post(async (req, res) => {
       email: user.email
     };
     const token = generateToken(newPayload);
-    const tokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      expires: tokenExpiry
-    });
     return res.status(200).json({
       message: 'Token refreshed',
       token: token
