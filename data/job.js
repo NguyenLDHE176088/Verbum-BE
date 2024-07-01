@@ -1,4 +1,5 @@
 import db from '../prisma/prisma-instance.js';
+import {WORKFLOW_TRANSLATION, WORKFLOW_REVIEW} from '../data/constants/workflow.js';
 
 export const findJobsByProjectId = async (projectId) => {
     try {
@@ -23,7 +24,7 @@ export const createJobs = async (jobs) => {
 
             // Iterate over each job in the array
             for (const jobData of jobs) {
-                const { name, status, dueDate, fileExtension, userIds, projectId, targetLanguageId, documentUrl } = jobData;
+                const { name, status, dueDate, fileExtension, userIds, projectId, targetLanguageId, documentUrl, qaRequired } = jobData;
 
                 // Create the job
                 const job = await prisma.job.create({
@@ -34,23 +35,41 @@ export const createJobs = async (jobs) => {
                         fileExtension,
                         targetLanguageId,
                         projectId,
-                        documentUrl
+                        documentUrl,
+                        isUseQA: qaRequired.isUseQA
                     }
                 });
 
+                // Prepare an array to hold all userJob creation promises
+                const userJobPromises = [];
+
                 // Assign users to the job
                 if (userIds && userIds.length > 0) {
-                    await Promise.all(
-                        userIds.map(userId =>
-                            prisma.userJob.create({
-                                data: {
-                                    userId,
-                                    jobId: job.id
-                                }
-                            })
-                        )
-                    );
+                    userJobPromises.push(...userIds.map(userId =>
+                        prisma.userJob.create({
+                            data: {
+                                userId,
+                                jobId: job.id,
+                                workflowId: WORKFLOW_TRANSLATION
+                            }
+                        })
+                    ));
                 }
+
+                // If QA is required, assign the reviewer to the job
+                if (qaRequired.isUseQA && qaRequired.reviewerId) {
+                    userJobPromises.push(prisma.userJob.create({
+                        data: {
+                            userId: qaRequired.reviewerId,
+                            jobId: job.id,
+                            workflowId: WORKFLOW_REVIEW
+                        }
+                    }));
+                }
+
+                // Execute all userJob creation promises
+                await Promise.all(userJobPromises);
+
                 createdJobs.push(job);
             }
 
