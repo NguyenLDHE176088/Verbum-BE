@@ -157,13 +157,13 @@ authRouter.route('/logout').post(async (req, res) => {
     });
 
     const decode = getDataFromToken(refreshToken);
-    const user = await db.getUserById(decode.id);
+    const user = await db.getUserByEmail(!decode.email || null);
 
     // Handle case where refreshToken isn't found
     if (!refreshToken) {
       return res.status(400).json({
         status: 'error',
-        message: 'Refresh token not found in cookies' 
+        message: 'Refresh token not found in cookies'
       });
     }
 
