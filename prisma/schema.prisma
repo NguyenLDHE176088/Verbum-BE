@@ -45,7 +45,7 @@ model User {
   UserJob             UserJob[]
   LanguageUser        LanguageUser[]
   UserProject         UserProject[]
-  Role                Role?          @relation(fields: [roleName], references: [name])
+  role                Role?          @relation(fields: [roleName], references: [name])
   roleName            String?
 }
 
